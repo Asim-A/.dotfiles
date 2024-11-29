@@ -154,7 +154,8 @@ vim.opt.inccommand = 'split'
 vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 20
+vim.opt.scrolloff = 30
+vim.opt.colorcolumn = '120'
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -175,7 +176,7 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 vim.keymap.set('n', 'gn', vim.diagnostic.goto_next)
-vim.keymap.set('n', 'gN', vim.diagnostic.goto_prev)
+vim.keymap.set('n', 'gp', vim.diagnostic.goto_prev)
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -946,6 +947,8 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.trouble',
+  require 'kickstart.plugins.undotree',
   vim.keymap.set('n', '<leader>e', function()
     require('neo-tree.command').execute { source = 'filesystem', toggle = true }
   end, { desc = 'file [e]xplorer' }),
