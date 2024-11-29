@@ -40,7 +40,11 @@ zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
 # Load completions
-autoload -Uz compinit && compinit
+autoload -Uz compinit
+for dump in ~/.zcompdump(N.mh+24); do
+  compinit
+done
+compinit -C
 
 zinit cdreplay -q
 
@@ -49,6 +53,7 @@ zinit cdreplay -q
 
 # Keybindings
 bindkey -e
+# bindkey '^y' autosuggest-accept # doubt this works, but will keep it here in case I want to figure out how to make it happen
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 
