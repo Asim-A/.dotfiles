@@ -82,6 +82,7 @@ setopt GLOB_DOTS # include dotfiles
 alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
+alias grep='rg'
 
 # Shell integrations
 eval "$(fzf --zsh)"
