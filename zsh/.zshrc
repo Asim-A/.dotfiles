@@ -29,7 +29,6 @@ zinit ice depth=1; zinit light romkatv/powerlevel10k
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
 
 # Add in snippets
 zinit snippet OMZL::git.zsh
@@ -46,6 +45,7 @@ for dump in ~/.zcompdump(N.mh+24); do
 done
 compinit -C
 
+
 zinit cdreplay -q
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
@@ -56,6 +56,7 @@ bindkey -e
 # bindkey '^y' autosuggest-accept # doubt this works, but will keep it here in case I want to figure out how to make it happen
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
+bindkey '^I' complete-word
 
 # History
 HISTSIZE=3000
@@ -88,3 +89,4 @@ eval "$(fzf --zsh)"
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
 
+zinit light Aloxaf/fzf-tab
