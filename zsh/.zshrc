@@ -83,6 +83,7 @@ alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
 alias grep='rg'
+alias cdgit='mkdir -p ~/git && cd ~/git'
 
 # Shell integrations
 eval "$(fzf --zsh)"
