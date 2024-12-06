@@ -83,7 +83,11 @@ alias ls='ls --color'
 alias vim='nvim'
 alias c='clear'
 alias grep='rg'
+alias zshh='source ~/.zshrc'
 alias cdgit='mkdir -p ~/git && cd ~/git'
+alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
+alias rm='trash-put'
+
 
 # Shell integrations
 eval "$(fzf --zsh)"
