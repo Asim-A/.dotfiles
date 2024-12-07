@@ -1,3 +1,4 @@
+brew install git
 brew install zsh
 brew install stow
 brew install ripgrep
@@ -7,6 +8,8 @@ brew install make
 brew install fzf
 brew install tmux
 brew install neovim
+brew install lazygit
+brew install trash-cli
 brew install --cask wezterm
 
 chsh -s $(which zsh)
@@ -16,3 +19,5 @@ stow p10k
 stow tmux
 stow wezterm
 stow zsh
+stow karabiner
+stow gitconfig
