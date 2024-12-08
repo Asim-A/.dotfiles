@@ -91,6 +91,7 @@ alias rm='trash-put'
 
 # Shell integrations
 eval "$(fzf --zsh)"
+eval "$(fnm env --use-on-cd --shell zsh)"
 
 export DOTNET_ROOT=$HOME/.dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools

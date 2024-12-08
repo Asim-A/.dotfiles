@@ -4,7 +4,7 @@
 	process = git-lfs filter-process
 	required = true
 [user]
-	name = asm
+	name = Asim-A
 [credential]
 	helper = osxkeychain
 [push]

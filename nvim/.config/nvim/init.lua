@@ -949,6 +949,7 @@ require('lazy').setup({
   require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.trouble',
   require 'kickstart.plugins.undotree',
+  require 'kickstart.plugins.tmux-navigator',
   vim.keymap.set('n', '<leader>e', function()
     require('neo-tree.command').execute { source = 'filesystem', toggle = true }
   end, { desc = 'file [e]xplorer' }),
