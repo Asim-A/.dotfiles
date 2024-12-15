@@ -169,12 +169,16 @@ vim.keymap.set('i', '<C-k>', '[]<Left>', { desc = '[' })
 vim.keymap.set('i', '<C-l>', '<Esc>la', { desc = 'Shift right' })
 vim.keymap.set('i', '<C-h>', '<Esc>i', { desc = 'Shift left' })
 
+vim.g.neovide_input_macos_alt_is_meta = true
+
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
+vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
 vim.keymap.set('n', 'gn', vim.diagnostic.goto_next)
 vim.keymap.set('n', 'gp', vim.diagnostic.goto_prev)
 
