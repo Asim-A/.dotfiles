@@ -955,7 +955,7 @@ require('lazy').setup({
   require 'kickstart.plugins.undotree',
   require 'kickstart.plugins.tmux-navigator',
   vim.keymap.set('n', '<leader>e', function()
-    require('neo-tree.command').execute { source = 'filesystem', toggle = true }
+    require('neo-tree.command').execute { source = 'filesystem', toggle = true, position = 'right' }
   end, { desc = 'file [e]xplorer' }),
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
