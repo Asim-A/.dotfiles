@@ -12,6 +12,7 @@ fi
 
 # Set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+VOLTA_HOME="$HOME/.volta"
 
 # Download Zinit, if it's not there yet
 if [ ! -d "$ZINIT_HOME" ]; then
@@ -91,9 +92,9 @@ alias rm='trash-put'
 
 # Shell integrations
 eval "$(fzf --zsh)"
-eval "$(fnm env --use-on-cd --shell zsh)"
+
 
 export DOTNET_ROOT=$HOME/.dotnet
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools
+export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$VOLTA_HOME/bin
 
 zinit light Aloxaf/fzf-tab

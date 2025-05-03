@@ -10,8 +10,8 @@ brew install tmux
 brew install neovim
 brew install lazygit
 brew install trash-cli
-brew install fnm
 brew install --cask wezterm
+curl https://get.volta.sh | bash
 
 chsh -s $(which zsh)
 
