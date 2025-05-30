@@ -6,32 +6,32 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
 fi
 
 if [[ -f "/opt/homebrew/bin/brew" ]] then
-  # If you're using macOS, you'll want this enabled
+  # if you're using macOS, you'll want this enabled
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
-# Set the directory we want to store zinit and plugins
+# set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 VOLTA_HOME="$HOME/.volta"
 
-# Download Zinit, if it's not there yet
+# download Zinit, if it's not there yet
 if [ ! -d "$ZINIT_HOME" ]; then
    mkdir -p "$(dirname $ZINIT_HOME)"
    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
 fi
 
-# Source/Load zinit
+# source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# Add in Powerlevel10k
+# add in Powerlevel10k
 zinit ice depth=1; zinit light romkatv/powerlevel10k
 
-# Add in zsh plugins
+# add in zsh plugins
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
 
-# Add in snippets
+# add in snippets
 zinit snippet OMZL::git.zsh
 zinit snippet OMZP::git
 zinit snippet OMZP::sudo
@@ -39,7 +39,7 @@ zinit snippet OMZP::kubectl
 zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
-# Load completions
+# load completions
 autoload -Uz compinit
 for dump in ~/.zcompdump(N.mh+24); do
   compinit
@@ -49,17 +49,17 @@ compinit -C
 
 zinit cdreplay -q
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+# to customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-# Keybindings
+# keybindings
 bindkey -e
 # bindkey '^y' autosuggest-accept # doubt this works, but will keep it here in case I want to figure out how to make it happen
 bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^I' complete-word
 
-# History
+# history
 HISTSIZE=3000
 HISTFILE=~/.zsh_history
 SAVEHIST=$HISTSIZE
@@ -72,25 +72,32 @@ setopt hist_save_no_dups
 setopt hist_ignore_dups
 setopt hist_find_no_dups
 
-# Completion styling
+# completion styling
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 zstyle ':completion:*' menu no
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
 setopt GLOB_DOTS # include dotfiles
 
-# Aliases
+# aliases
 alias ls='ls --color'
-alias vim='nvim'
 alias c='clear'
 alias grep='rg'
-alias zshh='source ~/.zshrc'
-alias cdgit='mkdir -p ~/git && cd ~/git'
-alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
 alias rm='trash-put'
+alias py='python3'
+
+alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
+
+alias vim='nvim'
+alias zshh='source ~/.zshrc'
+alias zshedit='nvim ~/.zshrc'
+alias sshedit='nvim ~/.ssh'
+
+alias cdgit='mkdir -p ~/git && cd ~/git'
+alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
 
 
-# Shell integrations
+# shell integrations
 eval "$(fzf --zsh)"
 
 
