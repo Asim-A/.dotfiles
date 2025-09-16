@@ -482,6 +482,13 @@ require('lazy').setup({
       -- Allows extra capabilities provided by nvim-cmp
       'hrsh7th/cmp-nvim-lsp',
     },
+    opts = {
+      servers = {
+        sourcekit = {
+          cmd = '/usr/bin/sourcekit-lsp',
+        },
+      },
+    },
     config = function()
       -- Brief aside: **What is LSP?**
       --
@@ -657,6 +664,8 @@ require('lazy').setup({
           },
         },
       }
+      local lspconfig = require 'lspconfig'
+      lspconfig.sourcekit.setup {}
 
       -- Ensure the servers and tools above are installed
       --  To check the current status of installed tools and/or manually install
@@ -670,7 +679,7 @@ require('lazy').setup({
       -- for you, so that they are available from within Neovim.
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
+        --'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -871,7 +880,11 @@ require('lazy').setup({
 
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
-
+  {
+    'vhyrro/luarocks.nvim',
+    priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
+    config = true,
+  },
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
@@ -956,6 +969,8 @@ require('lazy').setup({
   require 'kickstart.plugins.trouble',
   require 'kickstart.plugins.undotree',
   require 'kickstart.plugins.tmux-navigator',
+  require 'kickstart.plugins.nvim-ts-autotag',
+
   vim.keymap.set('n', '<leader>e', function()
     require('neo-tree.command').execute { source = 'filesystem', toggle = true, position = 'right' }
   end, { desc = 'file [e]xplorer' }),
