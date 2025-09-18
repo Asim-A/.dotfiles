@@ -81,7 +81,6 @@ setopt GLOB_DOTS # include dotfiles
 
 # aliases
 alias ls='ls --color'
-alias c='clear'
 alias grep='rg'
 alias rm='trash-put'
 alias py='python3'
@@ -96,6 +95,7 @@ alias sshedit='nvim ~/.ssh'
 alias cdgit='mkdir -p ~/git && cd ~/git'
 alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
 
+alias cddot='cd ~/.dotfiles'
 
 # shell integrations
 eval "$(fzf --zsh)"
