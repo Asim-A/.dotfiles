@@ -101,7 +101,8 @@ alias cddot='cd ~/.dotfiles'
 eval "$(fzf --zsh)"
 
 
-export DOTNET_ROOT=$HOME/.dotnet
+export DOTNET_ROOT=/usr/local/share/dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$VOLTA_HOME/bin
+export MASON=$HOME/.local/share/nvim/mason
 
 zinit light Aloxaf/fzf-tab
