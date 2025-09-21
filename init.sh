@@ -7,6 +7,9 @@ brew install gcc
 brew install make
 brew install fzf
 brew install tmux
+brew install resvg
+brew install yazi
+brew install poppler
 brew install neovim
 brew install lazygit
 brew install trash-cli
