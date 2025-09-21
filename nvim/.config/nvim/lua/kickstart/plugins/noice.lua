@@ -1,6 +1,5 @@
 return {
   'folke/noice.nvim',
-  event = 'VeryLazy',
   opts = {
     -- You can add your configuration options here
     -- For example, to enable it on startup:
