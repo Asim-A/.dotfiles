@@ -25,3 +25,4 @@ stow wezterm
 stow zsh
 stow karabiner
 stow gitconfig
+stow yazi

@@ -104,5 +104,6 @@ eval "$(fzf --zsh)"
 export DOTNET_ROOT=/usr/local/share/dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$VOLTA_HOME/bin
 export MASON=$HOME/.local/share/nvim/mason
+export EDITOR=nvim
 
 zinit light Aloxaf/fzf-tab
