@@ -775,35 +775,12 @@ require('lazy').setup({
     },
   },
 
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.yazi',
-  require 'kickstart.plugins.noice',
-  require 'kickstart.plugins.flash',
-  require 'kickstart.plugins.trouble',
-  -- require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.undotree',
-  require 'kickstart.plugins.gitsigns',
-  require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.dap-dotnet',
-  require 'kickstart.plugins.netcoredbg-arm',
-  require 'kickstart.plugins.tmux-navigator',
-  require 'kickstart.plugins.nvim-ts-autotag',
+  { import = 'lazy.plugins' },
 
   vim.keymap.set('n', '<leader>e', function()
     require('neo-tree.command').execute { source = 'filesystem', toggle = true, position = 'right' }
   end, { desc = 'file [e]xplorer' }),
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  { import = 'custom.plugins' },
   --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
