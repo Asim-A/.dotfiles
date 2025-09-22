@@ -781,10 +781,11 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.yazi',
   require 'kickstart.plugins.noice',
+  require 'kickstart.plugins.flash',
   require 'kickstart.plugins.trouble',
   -- require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.yazi',
   require 'kickstart.plugins.undotree',
   require 'kickstart.plugins.gitsigns',
   require 'kickstart.plugins.autopairs',
