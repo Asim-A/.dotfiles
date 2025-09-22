@@ -50,6 +50,9 @@ vim.keymap.set('i', '<C-k>', '[]<Left>', { desc = '[' })
 vim.keymap.set('i', '<C-l>', '<Esc>la', { desc = 'Shift right' })
 vim.keymap.set('i', '<C-h>', '<Esc>i', { desc = 'Shift left' })
 
+vim.keymap.set('v', '<', '<gv', { desc = 'Indent left and reselect' })
+vim.keymap.set('v', '>', '>gv', { desc = 'Indent left and reselect' })
+
 vim.g.neovide_input_macos_alt_is_meta = true
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
