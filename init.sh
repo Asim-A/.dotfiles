@@ -23,6 +23,5 @@ stow p10k
 stow tmux
 stow wezterm
 stow zsh
-stow karabiner
 stow gitconfig
 stow yazi
