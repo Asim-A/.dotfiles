@@ -220,6 +220,13 @@ require('lazy').setup({
         --   },
         -- },
         -- pickers = {}
+        defaults = {
+          layout_config = {
+            vertical = {
+              prompt_position = 'top',
+            },
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -758,10 +765,6 @@ require('lazy').setup({
   },
 
   { import = 'lazy.plugins' },
-
-  vim.keymap.set('n', '<leader>e', function()
-    require('neo-tree.command').execute { source = 'filesystem', toggle = true, position = 'right' }
-  end, { desc = 'file [e]xplorer' }),
 }, {
   ui = {
     icons = vim.g.have_nerd_font and {} or {
