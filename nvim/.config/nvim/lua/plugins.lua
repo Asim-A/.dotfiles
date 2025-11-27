@@ -1,7 +1,6 @@
 require 'lazy.plugins.lint'
 require 'lazy.plugins.yazi'
 require 'lazy.plugins.noice'
-require 'lazy.plugins.flash'
 require 'lazy.plugins.trouble'
 require 'lazy.plugins.undotree'
 require 'lazy.plugins.neo-tree'
