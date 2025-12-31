@@ -19,7 +19,8 @@ config.keys = {
 }
 
 -- For example, changing the color scheme:
-config.color_scheme = "Github Dark"
+config.color_scheme = "GruvboxDarkHard"
+
 config.automatically_reload_config = true
 config.window_decorations = "RESIZE"
 config.hide_tab_bar_if_only_one_tab = true
