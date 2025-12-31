@@ -53,6 +53,12 @@ vim.keymap.set('i', '<C-h>', '<Esc>i', { desc = 'Shift left' })
 
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left and reselect' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent left and reselect' })
+vim.api.nvim_set_keymap(
+  'n', -- Mode: Normal mode
+  's', -- Key to map
+  's', -- Command: The built-in substitute command
+  { noremap = true, silent = true, desc = 'Default substitute character' }
+)
 
 vim.g.neovide_input_macos_alt_is_meta = true
 
@@ -60,8 +66,8 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
-vim.keymap.set('n', '<M-j>', '<cmd>cnext<CR>')
-vim.keymap.set('n', '<M-k>', '<cmd>cprev<CR>')
+vim.keymap.set('n', '<M-n>', '<cmd>cnext<CR>')
+vim.keymap.set('n', '<M-p>', '<cmd>cprev<CR>')
 vim.keymap.set('n', 'gn', function()
   vim.diagnostic.jump { count = 1, float = true }
 end)
@@ -153,7 +159,7 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch' },
         { '<leader>w', group = '[W]orkspace' },
         { '<leader>t', group = '[T]oggle' },
-        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>g', group = '[G]it Hunk', mode = { 'n', 'v' } },
       },
     },
   },
@@ -242,32 +248,66 @@ require('lazy').setup({
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
+
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>ff', function()
+        builtin.find_files { hidden = true }
+      end, { desc = '[S]earch [A]ll [F]iles (including hidden)' })
+
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
+      vim.keymap.set('v', '♠', function()
+        local function get_visual_selection()
+          vim.cmd 'noau normal! "vy'
+          local text = vim.fn.getreg 'v'
+          vim.fn.setreg('v', {})
+          return text
+        end
+
+        builtin.grep_string {
+          search = get_visual_selection(),
+          additional_args = function(opts)
+            return { '--hidden' }
+          end,
+        }
+      end, { desc = 'Find visual selection' })
+      vim.keymap.set('n', '<leader>sw', function()
+        builtin.grep_string {
+          additional_args = function(opts)
+            return { '--hidden' }
+          end,
+        }
+      end, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '' })
+      vim.keymap.set('n', '♠', function() -- gamechanger
+        builtin.live_grep {
+          additional_args = function(opts)
+            return { '--hidden' }
+          end,
+        }
+      end, { desc = '[S]earch [A]ll [F]iles (including hidden)' })
+
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
       -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set('n', '<leader>/', function()
+      vim.keymap.set('n', '<C-f>', function()
         -- You can pass additional configuration to Telescope to change the theme, layout, etc.
         builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
           winblend = 10,
-          previewer = false,
+          previewer = true,
         })
       end, { desc = '[/] Fuzzily search in current buffer' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set('n', '<leader>s/', function()
+      vim.keymap.set('n', '<leader>sg', function()
         builtin.live_grep {
           grep_open_files = true,
           prompt_title = 'Live Grep in Open Files',
         }
-      end, { desc = '[S]earch [/] in Open Files' })
+      end, { desc = '[S]earch by [G]rep in Open Files' })
 
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
@@ -536,7 +576,7 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '♣',
         function()
           require('conform').format { async = true, lsp_format = 'fallback' }
         end,

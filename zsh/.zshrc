@@ -94,8 +94,12 @@ alias sshedit='nvim ~/.ssh'
 
 alias cdgit='mkdir -p ~/git && cd ~/git'
 alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
-
 alias cddot='cd ~/.dotfiles'
+alias cddata='cd ~/Library/Application\ Support'
+alias gg='gemini -p'
+
+alias -g JQ '| jq';
+alias -g C '| pbcopy';
 
 # shell integrations
 eval "$(fzf --zsh)"
