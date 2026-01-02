@@ -14,6 +14,8 @@ config.keys = {
 	{ key = "n", mods = "CMD", action = wezterm.action.SendString("\x1bn") }, -- Alt+n
 	{ key = "p", mods = "CMD", action = wezterm.action.SendString("\x1bp") }, -- Alt+p
 	{ key = "f", mods = "CMD", action = wezterm.action.SendKey({ key = "f", mods = "CTRL" }) }, -- disable cmd+f
+
+	-- ♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ 
 	{ key = "F", mods = "CMD|SHIFT", action = wezterm.action.SendString("♠") },
 	{ key = "Enter", mods = "CMD|SHIFT", action = wezterm.action.SendString("♣") },
 }

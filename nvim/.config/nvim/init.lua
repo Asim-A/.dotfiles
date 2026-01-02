@@ -247,6 +247,7 @@ require('lazy').setup({
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
+      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
 
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -255,14 +256,16 @@ require('lazy').setup({
       end, { desc = '[S]earch [A]ll [F]iles (including hidden)' })
 
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('v', '♠', function()
-        local function get_visual_selection()
-          vim.cmd 'noau normal! "vy'
-          local text = vim.fn.getreg 'v'
-          vim.fn.setreg('v', {})
-          return text
-        end
+      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
 
+      local function get_visual_selection()
+        vim.cmd 'noau normal! "vy'
+        local text = vim.fn.getreg 'v'
+        vim.fn.setreg('v', {})
+        return text
+      end
+
+      vim.keymap.set('v', '♠', function()
         builtin.grep_string {
           search = get_visual_selection(),
           additional_args = function(opts)
@@ -270,6 +273,7 @@ require('lazy').setup({
           end,
         }
       end, { desc = 'Find visual selection' })
+
       vim.keymap.set('n', '<leader>sw', function()
         builtin.grep_string {
           additional_args = function(opts)
