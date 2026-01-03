@@ -46,6 +46,9 @@ for dump in ~/.zcompdump(N.mh+24); do
 done
 compinit -C
 
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
 
 zinit cdreplay -q
 
