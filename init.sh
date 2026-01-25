@@ -1,6 +1,6 @@
 chsh -s $(which zsh)
 
-stow nvim
+stow vimrc
 stow p10k
 stow zsh
 stow yazi
