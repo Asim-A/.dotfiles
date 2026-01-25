@@ -85,7 +85,6 @@ setopt GLOB_DOTS # include dotfiles
 # aliases
 alias ls='ls --color'
 alias grep='rg'
-alias rm='trash-put'
 alias py='python3'
 
 alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
@@ -100,7 +99,6 @@ alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
 alias cddot='cd ~/.dotfiles'
 alias cddata='cd ~/Library/Application\ Support'
 alias gg='gemini -p'
-
 alias -g JQ '| jq';
 alias -g C '| pbcopy';
 
@@ -111,6 +109,7 @@ eval "$(fzf --zsh)"
 export DOTNET_ROOT=/usr/local/share/dotnet
 export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$VOLTA_HOME/bin
 export MASON=$HOME/.local/share/nvim/mason
+export PATH="$HOME/.local/bin:$PATH"
 export EDITOR=nvim
 
 zinit light Aloxaf/fzf-tab
