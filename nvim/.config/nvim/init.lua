@@ -807,6 +807,22 @@ require('lazy').setup({
     },
   },
 })
+-- Define the configuration for rust-analyzer
+vim.lsp.config('rust_analyzer', {
+  install = {
+    -- Optional: If you use a manager to auto-install binaries
+  },
+  settings = {
+    ['rust-analyzer'] = {
+      checkOnSave = {
+        command = "clippy",
+      },
+      -- You can add other RA settings here like procMacro or inlayHints
+    },
+  },
+})
 
+-- Then, enable the server
+vim.lsp.enable('rust_analyzer')
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
