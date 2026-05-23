@@ -1,21 +1,11 @@
 return {
   {
     'seblyng/roslyn.nvim',
-    ---@module 'roslyn.config'
-    ---@type RoslynNvimConfig
     ft = { 'cs', 'razor' },
-    opts = {},
     dependencies = {
-      {
-        'tris203/rzls.nvim',
-        config = true,
-      },
+      { 'tris203/rzls.nvim', config = true },
     },
-    lazy = false,
     config = function()
-      -- Use one of the methods in the Integration section to compose the command.
-      local mason_registry = require 'mason-registry'
-
       local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
       local cmd = {
         'roslyn',
@@ -35,7 +25,6 @@ return {
           ['csharp|inlay_hints'] = {
             csharp_enable_inlay_hints_for_implicit_object_creation = true,
             csharp_enable_inlay_hints_for_implicit_variable_types = true,
-
             csharp_enable_inlay_hints_for_lambda_parameter_types = true,
             csharp_enable_inlay_hints_for_types = true,
             dotnet_enable_inlay_hints_for_indexer_parameters = true,
@@ -55,7 +44,6 @@ return {
       vim.lsp.enable 'roslyn'
     end,
     init = function()
-      -- We add the Razor file types before the plugin loads.
       vim.filetype.add {
         extension = {
           razor = 'razor',
@@ -65,50 +53,51 @@ return {
     end,
   },
   {
-    -- Debug Framework
     'mfussenegger/nvim-dap',
-    dependencies = {
-      'rcarriga/nvim-dap-ui',
-    },
-    config = function()
-      require 'configs.nvim-dap'
-    end,
-    event = 'VeryLazy',
-  },
-  { 'nvim-neotest/nvim-nio' },
-  {
-    -- UI for debugging
-    'rcarriga/nvim-dap-ui',
-    dependencies = {
-      'mfussenegger/nvim-dap',
-    },
-    config = function()
-      require 'configs.nvim-dap-ui'
+    optional = true,
+    opts = function()
+      local dap = require 'dap'
+      local data_path = vim.fn.stdpath 'data'
+      local netcoredbg_path = data_path .. '/lazy/netcoredbg-macOS-arm64.nvim/netcoredbg/netcoredbg'
+
+      local netcoredbg_adapter = {
+        type = 'executable',
+        command = netcoredbg_path,
+        args = { '--interpreter=vscode' },
+      }
+
+      dap.adapters.netcoredbg = netcoredbg_adapter
+      dap.adapters.coreclr = netcoredbg_adapter
+
+      dap.configurations.cs = {
+        {
+          type = 'coreclr',
+          name = 'launch - netcoredbg',
+          request = 'launch',
+          program = function()
+            return require('dap-dll-autopicker').build_dll_path()
+          end,
+          console = 'integrateTerminal',
+          justMyCode = false,
+          stopAtEntry = false,
+          env = {
+            ASPNETCORE_ENVIRONMENT = 'Development',
+            ASPNETCORE_URLS = 'http://localhost:5050',
+          },
+        },
+      }
     end,
   },
   {
     'nvim-neotest/neotest',
-    requires = {
-      {
-        'Issafalcon/neotest-dotnet',
-      },
-    },
     dependencies = {
+      'Issafalcon/neotest-dotnet',
       'nvim-neotest/nvim-nio',
       'nvim-lua/plenary.nvim',
       'antoinemadec/FixCursorHold.nvim',
       'nvim-treesitter/nvim-treesitter',
     },
   },
-  {
-    'Issafalcon/neotest-dotnet',
-    lazy = false,
-    dependencies = {
-      'nvim-neotest/neotest',
-    },
-  },
-  {
-    'ramboe/ramboe-dotnet-utils',
-    dependencies = { 'mfussenegger/nvim-dap' },
-  },
+  { 'Cliffback/netcoredbg-macOS-arm64.nvim' },
+  { 'ramboe/ramboe-dotnet-utils' },
 }
