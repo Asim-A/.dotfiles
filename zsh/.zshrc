@@ -91,6 +91,7 @@ alias py='python3'
 alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
 
 alias vim='nvim'
+alias nvwip='NVIM_APPNAME=wip-nvim nvim'
 alias zshh='source ~/.zshrc'
 alias zshedit='nvim ~/.zshrc'
 alias sshedit='nvim ~/.ssh'
