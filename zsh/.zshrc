@@ -40,6 +40,7 @@ zinit snippet OMZP::kubectx
 zinit snippet OMZP::command-not-found
 
 # load completions
+fpath=(~/.zsh/completion $fpath)
 autoload -Uz compinit
 for dump in ~/.zcompdump(N.mh+24); do
   compinit
@@ -86,12 +87,15 @@ setopt GLOB_DOTS # include dotfiles
 alias ls='ls --color'
 alias grep='rg'
 alias rm='trash-put'
-alias py='python3'
+alias python="python3"
+alias pip="python3 -m pip"
 
 alias gitssh='git config core.sshCommand "ssh -i ~/.ssh/github -F /dev/null"'
 
 alias vim='nvim'
 alias zshh='source ~/.zshrc'
+alias venvinit='python3 -m venv .venv'
+alias venvactivate='source .venv/bin/activate'
 alias zshedit='nvim ~/.zshrc'
 alias sshedit='nvim ~/.ssh'
 
@@ -106,6 +110,7 @@ alias -g C '| pbcopy';
 
 # shell integrations
 eval "$(fzf --zsh)"
+eval "$(uv generate-shell-completion zsh)"
 
 
 export DOTNET_ROOT=/usr/local/share/dotnet
