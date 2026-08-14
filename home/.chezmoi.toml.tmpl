@@ -1,0 +1,26 @@
+{{/*
+  This template generates chezmoi's own config file (~/.config/chezmoi/chezmoi.toml)
+  the first time `chezmoi init` runs on a machine. It is NOT applied to the home
+  directory itself - it only supplies the `.data` values that the managed
+  dotfiles below use for OS-aware templating (`.chezmoi.os` is provided
+  natively by chezmoi and does not need to be asked for here).
+
+  promptStringOnce/promptBoolOnce only ask once: on subsequent
+  `chezmoi init`/`chezmoi update` runs the previously-entered value is reused
+  automatically, so this is a per-machine setup step, not a per-run one.
+*/}}
+{{- $email := promptStringOnce . "email" "Git email address for this machine" "" -}}
+{{- $isWorkMachine := promptBoolOnce . "isWorkMachine" "Is this a work machine (enables the local work-profile hook)" false -}}
+
+# Persist whatever path this repo currently lives at (e.g. C:\git\.dotfiles
+# on Windows, ~/git/.dotfiles on Mac) as the default sourceDir, so a plain
+# `chezmoi apply`/`chezmoi diff`/`chezmoi update` (no -S flag needed) keeps
+# using this in-place clone instead of chezmoi's own default location.
+# `.chezmoi.sourceDir` is already resolved *past* .chezmoiroot (it points at
+# home/), so strip that back off to land on the repo root, where
+# .chezmoiroot itself lives and can keep doing its job on every future run.
+sourceDir = {{ .chezmoi.sourceDir | trimSuffix "/home" | quote }}
+
+[data]
+    email = {{ $email | quote }}
+    isWorkMachine = {{ $isWorkMachine }}

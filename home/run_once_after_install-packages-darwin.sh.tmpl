@@ -1,0 +1,27 @@
+#!/bin/bash
+# Runs once, then re-runs whenever this script's content changes (chezmoi
+# hashes run_onceafter_ scripts). Brings a fresh macOS machine to parity with
+# `chezmoi init --apply --source=~/git/.dotfiles`.
+set -euo pipefail
+
+if ! command -v brew >/dev/null 2>&1; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+brew update
+
+{{ range .packages.darwin.formulae -}}
+brew install {{ . }}
+{{ end -}}
+{{ range .packages.darwin.casks -}}
+brew install --cask {{ . }}
+{{ end -}}
+
+if ! command -v volta >/dev/null 2>&1; then
+  curl https://get.volta.sh | bash
+fi
+
+zsh_path="$(command -v zsh)"
+if [ -n "$zsh_path" ] && [ "$SHELL" != "$zsh_path" ]; then
+  chsh -s "$zsh_path"
+fi

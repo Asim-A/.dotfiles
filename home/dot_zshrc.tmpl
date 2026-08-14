@@ -1,10 +1,3 @@
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 if [[ -f "/opt/homebrew/bin/brew" ]] then
   # if you're using macOS, you'll want this enabled
   eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -23,10 +16,8 @@ fi
 # source/Load zinit
 source "${ZINIT_HOME}/zinit.zsh"
 
-# add in Powerlevel10k
-zinit ice depth=1; zinit light romkatv/powerlevel10k
-
-# add in zsh plugins
+# zinit is kept for zsh plugins only - the prompt itself is Starship (see
+# below), shared with the Windows PowerShell profile.
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-completions
 zinit light zsh-users/zsh-autosuggestions
@@ -53,8 +44,8 @@ bindkey '^x^e' edit-command-line
 
 zinit cdreplay -q
 
-# to customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+# Starship prompt (shared config: ~/.config/starship.toml)
+eval "$(starship init zsh)"
 
 # keybindings
 bindkey -e
@@ -101,7 +92,7 @@ alias sshedit='nvim ~/.ssh'
 
 alias cdgit='mkdir -p ~/git && cd ~/git'
 alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
-alias cddot='cd ~/.dotfiles'
+alias cddot='cd "$(chezmoi source-path)"'
 alias cddata='cd ~/Library/Application\ Support'
 alias gg='gemini -p'
 
@@ -119,3 +110,8 @@ export MASON=$HOME/.local/share/nvim/mason
 export EDITOR=nvim
 
 zinit light Aloxaf/fzf-tab
+
+# Generic local-override hook: content-free in the public repo by design.
+# Anything organization/employer-specific lives in a separate private
+# repo/location and is sourced from there, never referenced by name here.
+[[ ! -f ~/.work-profile.zsh ]] || source ~/.work-profile.zsh

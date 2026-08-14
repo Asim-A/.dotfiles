@@ -1,0 +1,22 @@
+# Runs once, then re-runs whenever this script's content changes (chezmoi
+# hashes run_onceafter_ scripts). Brings a fresh Windows machine to parity
+# with `chezmoi init --apply --source=C:\git\.dotfiles`.
+$ErrorActionPreference = "Stop"
+
+if (Get-Command winget -ErrorAction SilentlyContinue) {
+{{ range .packages.windows.winget }}
+    winget install --id "{{ . }}" --silent --accept-package-agreements --accept-source-agreements -e
+{{ end -}}
+} else {
+    Write-Warning "winget not found - install these packages manually: {{ range .packages.windows.winget }}{{ . }} {{ end }}"
+}
+
+# PSFzf isn't distributed via winget - install as a PowerShell module instead.
+if (-not (Get-Module -ListAvailable -Name PSFzf)) {
+    Install-Module -Name PSFzf -Scope CurrentUser -Force
+}
+
+# Persist XDG_CONFIG_HOME so Neovim/WezTerm/Yazi resolve the same ~/.config
+# paths used on Mac/Linux, collapsing the Windows-only AppData special-casing
+# (see dot_config/nvim, dot_config/wezterm, dot_config/yazi).
+[Environment]::SetEnvironmentVariable("XDG_CONFIG_HOME", "$HOME\.config", "User")

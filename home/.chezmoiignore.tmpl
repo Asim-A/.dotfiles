@@ -1,0 +1,18 @@
+{{/*
+  Target-relative paths (as chezmoi source-name parsing would produce them),
+  not literal source file names.
+*/}}
+# tmux is superseded by WezTerm's native leader-key/pane-nav on Windows, and
+# zsh isn't the shell there either - skip both on Windows.
+{{- if eq .chezmoi.os "windows" }}
+.config/tmux
+.zshrc
+install-packages-darwin.sh
+{{- else }}
+# PowerShell profile is Windows-only.
+Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+install-packages-windows.ps1
+{{- end }}
+# lazy.nvim's plugin lockfile is machine-specific churn, not something the
+# dotfiles manager should own or overwrite.
+.config/nvim/lazy-lock.json

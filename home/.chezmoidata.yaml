@@ -1,0 +1,39 @@
+# Shared data consumed by templates in this source directory.
+# Keep this file free of anything organization-specific - it ships in the
+# public repo. Machine- or employer-specific values belong in a private
+# repo/location instead (see home/dot_gitconfig.tmpl's include hook and
+# the Windows PowerShell profile's work-profile hook).
+
+packages:
+  # Installed via Homebrew on macOS by run_onceafter_install-packages-darwin.sh.tmpl
+  darwin:
+    formulae:
+      - git
+      - zsh
+      - ripgrep
+      - unzip
+      - gcc
+      - make
+      - fzf
+      - tmux
+      - resvg
+      - yazi
+      - poppler
+      - neovim
+      - lazygit
+      - trash-cli
+      - starship
+    casks:
+      - wezterm
+  # Installed via winget on Windows by run_onceafter_install-packages-windows.ps1.tmpl
+  windows:
+    winget:
+      - Git.Git
+      - BurntSushi.ripgrep.MSVC
+      - junegunn.fzf
+      - Neovim.Neovim
+      - JesseDuffield.lazygit
+      - sxyazi.yazi
+      - Starship.Starship
+      - wez.wezterm
+      - Volta.Volta

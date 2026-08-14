@@ -1,0 +1,37 @@
+[user]
+	name = Asim-A
+{{- if .email }}
+	email = {{ .email }}
+{{- end }}
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[push]
+	autoSetupRemote = true
+[help]
+	autoCorrect = "prompt"
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+	helper = osxkeychain
+{{- else if eq .chezmoi.os "windows" }}
+[credential]
+	helper = manager
+{{- end }}
+# Enforce SSH
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+[url "ssh://git@gitlab.com/"]
+	insteadOf = https://gitlab.com/
+[url "ssh://git@bitbucket.org/"]
+	insteadOf = https://bitbucket.org/
+
+# Machine-/organization-specific settings (credential overrides, TFS or other
+# internal `safe.directory` entries, work email overrides, etc.) never belong
+# in this public repo. Create this file locally and it will be picked up
+# automatically; it is intentionally never referenced by name/path/hostname
+# from anywhere else in this repo.
+[include]
+	path = ~/.gitconfig.local
+

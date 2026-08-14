@@ -77,10 +77,17 @@ end)
 
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- On Windows there is no tmux layer; WezTerm handles pane splits directly, so
+-- pane navigation is delegated to the wezterm-move.nvim plugin instead (see
+-- lua/lazy/plugins/pane-nav.lua). Elsewhere, vim-tmux-navigator's own default
+-- <C-h/j/k/l> mappings provide seamless nvim<->tmux navigation, so these
+-- native window-nav keymaps mainly serve as a plain-nvim fallback there.
+if vim.fn.has 'win32' == 0 then
+  vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+  vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+  vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+  vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+end
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -247,7 +254,6 @@ require('lazy').setup({
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
 
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -256,16 +262,15 @@ require('lazy').setup({
       end, { desc = '[S]earch [A]ll [F]iles (including hidden)' })
 
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-
-      local function get_visual_selection()
-        vim.cmd 'noau normal! "vy'
-        local text = vim.fn.getreg 'v'
-        vim.fn.setreg('v', {})
-        return text
-      end
 
       vim.keymap.set('v', '♠', function()
+        local function get_visual_selection()
+          vim.cmd 'noau normal! "vy'
+          local text = vim.fn.getreg 'v'
+          vim.fn.setreg('v', {})
+          return text
+        end
+
         builtin.grep_string {
           search = get_visual_selection(),
           additional_args = function(opts)
@@ -273,7 +278,6 @@ require('lazy').setup({
           end,
         }
       end, { desc = 'Find visual selection' })
-
       vim.keymap.set('n', '<leader>sw', function()
         builtin.grep_string {
           additional_args = function(opts)
@@ -514,6 +518,11 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
+        -- Some languages (like typescript) have entire language plugins that can be useful:
+        --    https://github.com/pmizio/typescript-tools.nvim
+        --
+        -- But for many setups, the LSP (`ts_ls`) will work just fine
+        ts_ls = {},
         lua_ls = {
           -- cmd = {...},
           -- filetypes = { ...},
