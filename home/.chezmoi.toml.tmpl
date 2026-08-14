@@ -10,7 +10,6 @@
   automatically, so this is a per-machine setup step, not a per-run one.
 */}}
 {{- $email := promptStringOnce . "email" "Git email address for this machine" "" -}}
-{{- $isWorkMachine := promptBoolOnce . "isWorkMachine" "Is this a work machine (enables the local work-profile hook)" false -}}
 
 # Persist whatever path this repo currently lives at (e.g. C:\git\.dotfiles
 # on Windows, ~/git/.dotfiles on Mac) as the default sourceDir, so a plain
@@ -23,4 +22,3 @@ sourceDir = {{ .chezmoi.sourceDir | trimSuffix "/home" | quote }}
 
 [data]
     email = {{ $email | quote }}
-    isWorkMachine = {{ $isWorkMachine }}

@@ -62,10 +62,10 @@ chezmoi init --apply --source=C:\git\.dotfiles
 ```
 
 `chezmoi init` prompts once per machine (see `home/.chezmoi.toml.tmpl`) for
-your git email and whether this is a work machine, then applies the managed
-files. A `run_once_after_install-packages-<os>` script (Homebrew on macOS,
-winget on Windows) installs the required tools - see `home/.chezmoidata.yaml`
-for the package list.
+your git email, then applies the managed files. A
+`run_once_after_install-packages-<os>` script (Homebrew on macOS, winget on
+Windows) installs the required tools - see `home/.chezmoidata.yaml` for the
+package list.
 
 Windows additionally gets `XDG_CONFIG_HOME` set to `%USERPROFILE%\.config`
 persistently, so Neovim/WezTerm/Yazi resolve the exact same `~/.config/...`
