@@ -11,7 +11,6 @@ return {
         config = true,
       },
     },
-    lazy = false,
     config = function()
       -- Use one of the methods in the Integration section to compose the command.
       local mason_registry = require 'mason-registry'
@@ -21,7 +20,7 @@ return {
         'roslyn',
         '--stdio',
         '--logLevel=Information',
-        '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.get_log_path()),
+        '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.log.get_filename()),
         '--razorSourceGenerator=' .. vim.fs.joinpath(rzls_path, 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
         '--razorDesignTimePath=' .. vim.fs.joinpath(rzls_path, 'Targets', 'Microsoft.NET.Sdk.Razor.DesignTime.targets'),
         '--extension',
