@@ -1,7 +1,8 @@
 --[[
 --
--- This file is not required for your own configuration,
--- but helps people determine if their system is setup correctly.
+-- `:checkhealth` support for this personal config. Not required to use the
+-- config itself, but a quick way to confirm the tools it relies on are
+-- actually available on this machine.
 --
 --]]
 
@@ -20,7 +21,7 @@ local check_version = function()
 end
 
 local check_external_reqs = function()
-  -- Basic utils: `git`, `make`, `unzip`
+  -- Basic utils used by telescope/lazy/conform/etc.
   for _, exe in ipairs { 'git', 'make', 'unzip', 'rg' } do
     local is_executable = vim.fn.executable(exe) == 1
     if is_executable then
@@ -29,13 +30,32 @@ local check_external_reqs = function()
       vim.health.warn(string.format("Could not find executable: '%s'", exe))
     end
   end
+end
 
-  return true
+local check_language_toolchains = function()
+  vim.health.info 'Per-language toolchains (only needed for the languages you actually use):'
+
+  -- name, executable, what it's used for
+  local toolchains = {
+    { 'dotnet', 'dotnet', 'building .NET projects debugged via netcoredbg/roslyn' },
+    { 'go', 'go', 'gopls/dap-go/delve' },
+    { 'python', 'python', 'pyright/ruff/debugpy' },
+    { 'node', 'node', 'ts_ls/js-debug-adapter/neotest-jest/neotest-vitest' },
+  }
+
+  for _, toolchain in ipairs(toolchains) do
+    local name, exe, used_for = toolchain[1], toolchain[2], toolchain[3]
+    if vim.fn.executable(exe) == 1 then
+      vim.health.ok(string.format("Found '%s' (used for %s)", name, used_for))
+    else
+      vim.health.warn(string.format("Could not find '%s' (used for %s)", name, used_for))
+    end
+  end
 end
 
 return {
   check = function()
-    vim.health.start 'kickstart.nvim'
+    vim.health.start 'Personal Neovim config'
 
     vim.health.info [[NOTE: Not every warning is a 'must-fix' in `:checkhealth`
 
@@ -48,5 +68,6 @@ return {
 
     check_version()
     check_external_reqs()
+    check_language_toolchains()
   end,
 }

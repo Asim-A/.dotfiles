@@ -10,11 +10,13 @@ return {
         'tris203/rzls.nvim',
         config = true,
       },
+      -- Debug adapter + dap.adapters/dap.configurations for C# below
+      'mfussenegger/nvim-dap',
+      -- Provides `dap-dll-autopicker`, used to find the built DLL to launch
+      'ramboe/ramboe-dotnet-utils',
     },
     config = function()
       -- Use one of the methods in the Integration section to compose the command.
-      local mason_registry = require 'mason-registry'
-
       local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
       local cmd = {
         'roslyn',
@@ -52,6 +54,55 @@ return {
         },
       })
       vim.lsp.enable 'roslyn'
+
+      -- .NET debugging (netcoredbg). This file only lazy-loads on `cs`/`razor`
+      -- filetypes, so it's a natural place to register the adapter alongside
+      -- the LSP -- the shared dap/dapui/keymap core lives in plugins/dap.lua.
+      local dap = require 'dap'
+
+      -- netcoredbg is installed by mason-tool-installer (see plugins/lsp.lua),
+      -- which prepends Mason's bin dir to `PATH`. Resolving it with
+      -- `vim.fn.exepath` (rather than a hardcoded plugin-install path) keeps
+      -- this working on Windows/Linux/macOS alike, unlike the previous
+      -- `netcoredbg-macOS-arm64.nvim`-only path.
+      local function netcoredbg_cmd()
+        local cmd = vim.fn.exepath 'netcoredbg'
+        if cmd == '' then
+          vim.notify('netcoredbg not found on PATH -- install it via :Mason', vim.log.levels.WARN)
+        end
+        return cmd
+      end
+
+      local netcoredbg_adapter = {
+        type = 'executable',
+        command = netcoredbg_cmd(),
+        args = { '--interpreter=vscode' },
+      }
+
+      dap.adapters.netcoredbg = netcoredbg_adapter -- needed for normal debugging
+      dap.adapters.coreclr = netcoredbg_adapter -- needed for unit test debugging (neotest-dotnet)
+
+      dap.configurations.cs = {
+        {
+          type = 'coreclr',
+          name = 'launch - netcoredbg',
+          request = 'launch',
+          program = function()
+            return require('dap-dll-autopicker').build_dll_path()
+          end,
+          console = 'integratedTerminal',
+          justMyCode = false,
+          stopAtEntry = false,
+          env = {
+            ASPNETCORE_ENVIRONMENT = function()
+              return 'Development'
+            end,
+            ASPNETCORE_URLS = function()
+              return 'http://localhost:5050'
+            end,
+          },
+        },
+      }
     end,
     init = function()
       -- We add the Razor file types before the plugin loads.
@@ -62,52 +113,5 @@ return {
         },
       }
     end,
-  },
-  {
-    -- Debug Framework
-    'mfussenegger/nvim-dap',
-    dependencies = {
-      'rcarriga/nvim-dap-ui',
-    },
-    config = function()
-      require 'configs.nvim-dap'
-    end,
-    event = 'VeryLazy',
-  },
-  { 'nvim-neotest/nvim-nio' },
-  {
-    -- UI for debugging
-    'rcarriga/nvim-dap-ui',
-    dependencies = {
-      'mfussenegger/nvim-dap',
-    },
-    config = function()
-      require 'configs.nvim-dap-ui'
-    end,
-  },
-  {
-    'nvim-neotest/neotest',
-    requires = {
-      {
-        'Issafalcon/neotest-dotnet',
-      },
-    },
-    dependencies = {
-      'nvim-neotest/nvim-nio',
-      'nvim-lua/plenary.nvim',
-      'antoinemadec/FixCursorHold.nvim',
-      'nvim-treesitter/nvim-treesitter',
-    },
-  },
-  {
-    'Issafalcon/neotest-dotnet',
-    lazy = false,
-    dependencies = {
-      'nvim-neotest/neotest',
-    },
-  },
-  {
-    'ramboe/ramboe-dotnet-utils',
-    dependencies = { 'mfussenegger/nvim-dap' },
   },
 }
