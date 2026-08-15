@@ -15,13 +15,20 @@ return { -- QoL utility bundle from folke; its `picker` module doubles as an
       -- the active picker backend; telescope-ui-select owns it otherwise.
       ui_select = require('config.picker').is_snacks(),
     },
-    -- Scaffolded but deliberately left off: enabling `explorer` would fight
-    -- with yazi.nvim's file manager (<leader>e, plugins/yazi.lua), and
-    -- enabling `notifier` would fight with noice.nvim's message UI
-    -- (plugins/noice.lua). Flipping either on is a separate, later
-    -- experiment - just change `enabled` here.
-    explorer = { enabled = false },
-    notifier = { enabled = false },
+    -- yazi.nvim (plugins/yazi.lua) keeps owning <leader>e and netrw
+    -- replacement/directory-open duties, so this doesn't fight it - the
+    -- explorer is opened manually via <C-S-e> below instead.
+    explorer = {
+      enabled = true,
+      replace_netrw = false,
+    },
+    -- GitHub CLI integration (issues/PRs), see the <leader>gh* keymaps below.
+    gh = {},
+    -- Replaces vim.ui.input (e.g. LSP rename prompts).
+    input = { enabled = true },
+    -- Replaces noice.nvim (removed) as the vim.notify UI.
+    notifier = { enabled = true },
+    quickfile = { enabled = true },
   },
   config = function(_, opts)
     local Snacks = require 'snacks'
@@ -102,5 +109,35 @@ return { -- QoL utility bundle from folke; its `picker` module doubles as an
     vim.keymap.set('n', '<leader>x', function() -- <leader>b/<leader>B are DAP breakpoint leaves (see plugins/dap.lua)
       Snacks.bufdelete()
     end, { desc = 'Delete Buffer' })
+
+    -- Toggle the file explorer sidebar. Kept off <leader>e (yazi.nvim owns
+    -- that, see plugins/yazi.lua) and off <C-e>/<C-S-e> (harpoon's quick menu,
+    -- plugins/harpoon.lua - most terminals don't report the shift modifier,
+    -- so <C-S-e> silently collapses to <C-e> and collides with it anyway).
+    -- `follow_file` defaults to true, so it stays in sync with the current buffer.
+    vim.keymap.set('n', '<leader>E', function()
+      local explorer = Snacks.picker.get({ source = 'explorer' })[1]
+      if explorer then
+        explorer:close()
+      else
+        Snacks.explorer()
+      end
+    end, { desc = 'Toggle file [E]xplorer' })
+
+    -- GitHub issues/PRs via the `gh` CLI. Namespaced under <leader>gh* (not
+    -- the upstream default <leader>gi/gp) since gitsigns already owns
+    -- <leader>gb/<leader>gd/<leader>gp/<leader>gr/... (plugins/gitsigns.lua).
+    vim.keymap.set('n', '<leader>ghi', function()
+      Snacks.picker.gh_issue()
+    end, { desc = '[G]it[H]ub [I]ssues (open)' })
+    vim.keymap.set('n', '<leader>ghI', function()
+      Snacks.picker.gh_issue { state = 'all' }
+    end, { desc = '[G]it[H]ub [I]ssues (all)' })
+    vim.keymap.set('n', '<leader>ghp', function()
+      Snacks.picker.gh_pr()
+    end, { desc = '[G]it[H]ub [P]ull requests (open)' })
+    vim.keymap.set('n', '<leader>ghP', function()
+      Snacks.picker.gh_pr { state = 'all' }
+    end, { desc = '[G]it[H]ub [P]ull requests (all)' })
   end,
 }
