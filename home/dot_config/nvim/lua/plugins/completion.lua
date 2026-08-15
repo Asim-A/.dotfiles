@@ -26,7 +26,7 @@ return { -- Autocompletion
 
 		completion = {
 			-- Auto-insert `()` after accepting a function/method completion,
-			-- matching the previous nvim-autopairs + cmp-autopairs behavior.
+			-- so accepted function and method completions are ready to call.
 			accept = { auto_brackets = { enabled = true } },
 			documentation = { auto_show = true },
 			menu = {},
