@@ -51,7 +51,7 @@ return {
         map('n', '<leader>gb', gitsigns.blame_line, { desc = 'git [b]lame line' })
         map('n', '<leader>gd', gitsigns.diffthis, { desc = 'git [d]iff against index' })
 
-        map('n', '<leader>gd', function()
+        map('n', '<leader>gD', function()
           gitsigns.diffthis '@'
         end, { desc = 'git [D]iff against last commit' })
         -- Toggles

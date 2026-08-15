@@ -14,19 +14,10 @@ return { -- Autoformat
   },
   opts = {
     notify_on_error = false,
-    format_on_save = function(bufnr)
-      -- local disable_filetypes = { c = true, cpp = true, c_sharp = false }
-      -- local lsp_format_opt
-      -- if disable_filetypes[vim.bo[bufnr].filetype] then
-      --   lsp_format_opt = 'never'
-      -- else
-      --   lsp_format_opt = 'fallback'
-      -- end
-      -- return {
-      --   timeout_ms = 500,
-      --   lsp_format = lsp_format_opt,
-      -- }
-    end,
+    -- Format-on-save is intentionally disabled: formatting is manual-only via
+    -- the '♣' keymap above (Ctrl+Shift+Enter in WezTerm). Saving itself is
+    -- handled continuously by auto-save.nvim (see plugins/auto-save.lua), so
+    -- there's no separate format_on_save/format_after_save hook here.
     formatters_by_ft = {
       lua = { 'stylua' },
     },

@@ -63,8 +63,10 @@ return {
         :find()
     end
 
-    vim.keymap.set('n', '<leader>sh', function()
+    -- NOTE: <leader>sh is telescope's [S]earch [H]elp (see plugins/telescope.lua);
+    -- Harpoon marks live at <leader>sm instead to avoid silently shadowing it.
+    vim.keymap.set('n', '<leader>sm', function()
       toggle_telescope(harpoon:list())
-    end, { desc = 'Search Harpoon Marks' })
+    end, { desc = '[S]earch Harpoon [M]arks' })
   end,
 }

@@ -46,7 +46,7 @@ return { -- Useful plugin to show you pending keybinds.
       { '<leader>r', group = '[R]ename' },
       { '<leader>s', group = '[S]earch' },
       { '<leader>w', group = '[W]orkspace' },
-      { '<leader>t', group = '[T]oggle' },
+      { '<leader>t', group = '[T]oggle/[T]est' },
       { '<leader>g', group = '[G]it Hunk', mode = { 'n', 'v' } },
     },
   },

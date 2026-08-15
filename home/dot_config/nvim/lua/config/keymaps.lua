@@ -10,12 +10,13 @@ vim.keymap.set('i', '<C-h>', '<Esc>i', { desc = 'Shift left' })
 
 vim.keymap.set('v', '<', '<gv', { desc = 'Indent left and reselect' })
 vim.keymap.set('v', '>', '>gv', { desc = 'Indent left and reselect' })
-vim.api.nvim_set_keymap(
-  'n', -- Mode: Normal mode
-  's', -- Key to map
-  's', -- Command: The built-in substitute command
-  { noremap = true, silent = true, desc = 'Default substitute character' }
-)
+
+-- NOTE: bare `s` intentionally stays as the built-in substitute command.
+-- mini.surround owns multi-key `s`-prefixed sequences (sa/sd/sr/sf/sh/sn), so
+-- Neovim briefly waits (up to 'timeoutlen') after a lone `s` to see whether a
+-- surround sequence follows. That hesitation is structural to having both
+-- substitute and mini.surround on the same `s` prefix - there used to be a
+-- no-op `s -> s` remap here that didn't change this behavior, so it was removed.
 
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 

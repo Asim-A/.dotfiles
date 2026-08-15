@@ -105,7 +105,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
         end,
       }
     end, { desc = '[S]earch current [W]ord' })
-    vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '' })
+    -- NOTE: <leader>sg is (re)defined further below as "Live Grep in Open
+    -- Files" - a prior plain live_grep binding here was dead/shadowed code
+    -- and has been removed.
     vim.keymap.set('n', '♠', function() -- gamechanger
       builtin.live_grep {
         additional_args = function(opts)
