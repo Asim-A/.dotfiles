@@ -161,7 +161,7 @@ return {
     --  - settings (table): Override the default settings passed when initializing the server.
     --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
     --
-    -- NOTE: `roslyn`/`rzls` (.NET) are configured in plugins/dap-dotnet.lua alongside
+    -- NOTE: `roslyn` (.NET) is configured in plugins/dap-dotnet.lua alongside
     -- the netcoredbg debug adapter, since that plugin owns the full .NET language setup.
     local servers = {
       sourcekit = {
@@ -238,6 +238,10 @@ return {
         'ruff',
         'rust-analyzer', -- rust_analyzer
         'lua-language-server', -- lua_ls
+        -- roslyn.nvim's LSP itself (see plugins/dap-dotnet.lua); pulled from
+        -- the `Crashdummyy/mason-registry` custom registry configured above,
+        -- since the official Mason registry's build lags behind vscode-csharp.
+        'roslyn',
         -- Formatters/linters
         'stylua',
         -- DAP adapters (see plugins/dap-*.lua)

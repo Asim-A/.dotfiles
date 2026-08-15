@@ -26,7 +26,7 @@ nvim/
 │   │   ├── lsp.lua       -- native vim.lsp.config()/vim.lsp.enable() for every server
 │   │   ├── completion.lua-- blink.cmp
 │   │   ├── dap.lua       -- shared nvim-dap + nvim-dap-ui core, unified keymaps
-│   │   ├── dap-dotnet.lua-- netcoredbg adapter + roslyn.nvim/rzls LSP
+│   │   ├── dap-dotnet.lua-- netcoredbg adapter + roslyn.nvim LSP
 │   │   ├── dap-go.lua    -- delve adapter (nvim-dap-go)
 │   │   ├── dap-python.lua-- debugpy adapter (nvim-dap-python)
 │   │   ├── dap-js.lua    -- js-debug adapter (nvim-dap-vscode-js)
@@ -40,7 +40,7 @@ nvim/
 
 | Language      | LSP                | Debugging (DAP)         | Tests (neotest)          |
 | ------------- | ------------------ | ------------------------ | ------------------------- |
-| C#/.NET       | `roslyn`/`rzls`     | `netcoredbg`              | `neotest-dotnet`           |
+| C#/.NET       | `roslyn`            | `netcoredbg`              | `neotest-dotnet`           |
 | Go            | `gopls`             | `delve` (`nvim-dap-go`)   | `neotest-go`               |
 | Python        | `pyright` + `ruff`  | `debugpy`                 | `neotest-python`           |
 | TypeScript/JS | `ts_ls`             | `js-debug-adapter`        | `neotest-jest`/`-vitest`   |

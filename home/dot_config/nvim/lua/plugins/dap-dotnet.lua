@@ -4,34 +4,27 @@ return {
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
     ft = { 'cs', 'razor' },
-    opts = {},
     dependencies = {
-      {
-        'tris203/rzls.nvim',
-        config = true,
-      },
       -- Debug adapter + dap.adapters/dap.configurations for C# below
       'mfussenegger/nvim-dap',
       -- Provides `dap-dll-autopicker`, used to find the built DLL to launch
       'ramboe/ramboe-dotnet-utils',
     },
     config = function()
-      -- Use one of the methods in the Integration section to compose the command.
-      local rzls_path = vim.fn.expand '$MASON/packages/rzls/libexec'
-      local cmd = {
-        'roslyn',
-        '--stdio',
-        '--logLevel=Information',
-        '--extensionLogDirectory=' .. vim.fs.dirname(vim.lsp.log.get_filename()),
-        '--razorSourceGenerator=' .. vim.fs.joinpath(rzls_path, 'Microsoft.CodeAnalysis.Razor.Compiler.dll'),
-        '--razorDesignTimePath=' .. vim.fs.joinpath(rzls_path, 'Targets', 'Microsoft.NET.Sdk.Razor.DesignTime.targets'),
-        '--extension',
-        vim.fs.joinpath(rzls_path, 'RazorExtension', 'Microsoft.VisualStudioCode.RazorExtension.dll'),
-      }
+      -- NOTE: as of recent roslyn.nvim releases, Razor/CSHTML support is
+      -- built into the `roslyn` language server itself via co-hosting, which
+      -- supersedes the old separate `rzls`/`rzls.nvim` server+plugin (see
+      -- https://github.com/seblyng/roslyn.nvim#razorcshtml-support). That
+      -- means roslyn.nvim now resolves its own `cmd` (it looks for the
+      -- Mason-installed `roslyn`/`roslyn-language-server` binary itself, see
+      -- `roslyn.utils.get_roslyn_lsp_path`), so we no longer need to hand it
+      -- a manually-built `cmd` with `--razorSourceGenerator`/`--extension`
+      -- flags pointing at a separate `rzls` Mason package -- that package no
+      -- longer exists in the registry, which silently broke `gd`/definition
+      -- lookups (the `roslyn` client never started).
+      require('roslyn').setup {}
 
       vim.lsp.config('roslyn', {
-        cmd = cmd,
-        handlers = require 'rzls.roslyn_handlers',
         settings = {
           ['csharp|inlay_hints'] = {
             csharp_enable_inlay_hints_for_implicit_object_creation = true,
