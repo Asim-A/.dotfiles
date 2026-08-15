@@ -32,12 +32,13 @@ return { -- QoL utility bundle from folke; its `picker` module doubles as an
   },
   config = function(_, opts)
     local Snacks = require 'snacks'
+    local picker = require 'config.picker'
     Snacks.setup(opts)
 
     -- Mirrors plugins/telescope.lua's <leader>s*/<C-f> keymaps 1:1, only
     -- registered while snacks is the active picker backend so the two
     -- plugins never fight over the same keys.
-    if require('config.picker').is_snacks() then
+    if picker.is_snacks() then
       vim.keymap.set('n', '<leader>sh', function()
         Snacks.picker.help()
       end, { desc = '[S]earch [H]elp' })
@@ -57,13 +58,13 @@ return { -- QoL utility bundle from folke; its `picker` module doubles as an
       end, { desc = '[S]earch [S]elect Snacks picker' })
 
       vim.keymap.set('v', '♠', function()
-        Snacks.picker.grep_word()
+        Snacks.picker.grep_word { cwd = picker.current_project_root() }
       end, { desc = 'Find visual selection' })
       vim.keymap.set('n', '<leader>sw', function()
         Snacks.picker.grep_word()
       end, { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '♠', function() -- gamechanger
-        Snacks.picker.grep { hidden = true }
+        Snacks.picker.grep { hidden = true, cwd = picker.current_project_root() }
       end, { desc = '[S]earch [A]ll [F]iles (including hidden)' })
 
       vim.keymap.set('n', '<leader>sd', function()
@@ -93,11 +94,10 @@ return { -- QoL utility bundle from folke; its `picker` module doubles as an
         Snacks.picker.files { cwd = vim.fn.stdpath 'config' }
       end, { desc = '[S]earch [N]eovim files' })
 
-      -- Snacks-only extra: there's no Telescope equivalent to mirror here.
-      -- <C-t> is otherwise unbound (aside from the built-in tag-jump-back
-      -- noted in plugins/lsp.lua), so there's no collision.
+      -- Telescope mirrors this with project-rooted find_files; it has no
+      -- direct equivalent to Snacks' smart picker.
       vim.keymap.set('n', '<C-t>', function()
-        Snacks.picker.smart()
+        Snacks.picker.smart { cwd = picker.current_project_root() }
       end, { desc = 'Smart Find Files' })
     end
 

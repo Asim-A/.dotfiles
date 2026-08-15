@@ -17,6 +17,19 @@ function M.is_snacks()
   return M.backend == 'snacks'
 end
 
+function M.current_project_root()
+  local buffer_name = vim.api.nvim_buf_get_name(0)
+  if buffer_name == '' then
+    return vim.fn.getcwd()
+  end
+
+  local file_path = vim.fs.normalize(vim.fn.fnamemodify(buffer_name, ':p'))
+  local file_dir = vim.fs.dirname(file_path)
+  local git_dir = vim.fs.find('.git', { path = file_dir, upward = true })[1]
+
+  return git_dir and vim.fs.dirname(git_dir) or file_dir
+end
+
 -- LSP wrappers used by the LspAttach keymaps in plugins/lsp.lua -----------
 
 function M.lsp_definitions()

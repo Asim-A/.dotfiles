@@ -67,6 +67,9 @@ nearest test.
   (see the `ensure_installed` list in `lua/plugins/lsp.lua`); run `:Mason` to
   check/manage installs.
 - Completion: [blink.cmp](https://github.com/Saghen/blink.cmp)
+- Picker shortcuts resolve from the current file's nearest Git root without
+  changing Neovim's working directory. `<C-t>` uses Snacks' smart picker or
+  Telescope's `find_files`, depending on the active backend.
 - Run `:checkhealth` to verify the external tools (`git`, `rg`, `make`,
   per-language toolchains) this config expects are on `PATH`.
 

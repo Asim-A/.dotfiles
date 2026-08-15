@@ -80,6 +80,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
 
     -- See `:help telescope.builtin`
     local builtin = require 'telescope.builtin'
+    local picker = require 'config.picker'
     vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
     vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
 
@@ -100,6 +101,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
 
       builtin.grep_string {
         search = get_visual_selection(),
+        cwd = picker.current_project_root(),
         additional_args = function(opts)
           return { '--hidden' }
         end,
@@ -117,6 +119,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
     -- and has been removed.
     vim.keymap.set('n', '♠', function() -- gamechanger
       builtin.live_grep {
+        cwd = picker.current_project_root(),
         additional_args = function(opts)
           return { '--hidden' }
         end,
@@ -150,5 +153,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
     vim.keymap.set('n', '<leader>sn', function()
       builtin.find_files { cwd = vim.fn.stdpath 'config' }
     end, { desc = '[S]earch [N]eovim files' })
+
+    vim.keymap.set('n', '<C-t>', function()
+      builtin.find_files { cwd = picker.current_project_root() }
+    end, { desc = 'Find Files (Project Root)' })
   end,
 }
