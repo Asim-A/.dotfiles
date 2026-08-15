@@ -2,9 +2,10 @@
 
 A batteries-included, IDE-like Neovim configuration -- LSP, debugging (DAP)
 and test running for .NET, Go, Python and TypeScript/JavaScript, plus a
-Telescope/which-key/mini.nvim-based editing experience. Not a distribution
-meant for others to install as-is; this is my own config, managed as part of
-[my dotfiles](../../../..) via [chezmoi](https://www.chezmoi.io/).
+which-key/mini.nvim-based editing experience with a switchable fuzzy-finder
+backend (Telescope or `snacks.nvim`'s picker, see `lua/config/picker.lua`).
+Not a distribution meant for others to install as-is; this is my own config,
+managed as part of [my dotfiles](../../../..) via [chezmoi](https://www.chezmoi.io/).
 
 It started from [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim)
 but has since been restructured into a multi-file, LazyVim-style layout and
@@ -21,17 +22,20 @@ nvim/
 │   │   ├── options.lua   -- vim.opt/vim.g settings
 │   │   ├── keymaps.lua   -- general (non-plugin-owned) keymaps
 │   │   ├── autocmds.lua  -- yank highlight, etc.
+│   │   ├── picker.lua    -- Telescope/snacks.picker backend switch + LSP/Harpoon wrappers
 │   │   └── lazy.lua      -- lazy.nvim bootstrap + setup({ spec = { { import = "plugins" } } })
 │   ├── plugins/          -- one file per plugin/feature, auto-imported by lazy.nvim
 │   │   ├── lsp.lua       -- native vim.lsp.config()/vim.lsp.enable() for every server
 │   │   ├── completion.lua-- blink.cmp
+│   │   ├── telescope.lua -- Telescope picker backend (active when config/picker.lua's backend = 'telescope')
+│   │   ├── snacks.lua    -- snacks.nvim picker backend + gitbrowse/bufdelete (active when backend = 'snacks')
 │   │   ├── dap.lua       -- shared nvim-dap + nvim-dap-ui core, unified keymaps
 │   │   ├── dap-dotnet.lua-- netcoredbg adapter + roslyn.nvim LSP
 │   │   ├── dap-go.lua    -- delve adapter (nvim-dap-go)
 │   │   ├── dap-python.lua-- debugpy adapter (nvim-dap-python)
 │   │   ├── dap-js.lua    -- js-debug adapter (nvim-dap-vscode-js)
 │   │   ├── neotest.lua   -- neotest + per-language adapters, dap strategy
-│   │   └── ...           -- telescope, treesitter, mini.nvim, gitsigns, etc.
+│   │   └── ...           -- treesitter, mini.nvim, gitsigns, etc.
 │   └── health.lua        -- :checkhealth checks tailored to this config
 └── README.md
 ```

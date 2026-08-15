@@ -42,31 +42,15 @@ return {
     vim.keymap.set('n', '<leader>h', function()
       clear_harpoon_list()
     end, { desc = 'Clear Harpoon list' })
-    -- OPTIONAL: Telescope UI integration
-    -- If you prefer searching through your marks with Telescope
-    local conf = require('telescope.config').values
-    local function toggle_telescope(harpoon_files)
-      local file_paths = {}
-      for _, item in ipairs(harpoon_files.items) do
-        table.insert(file_paths, item.value)
-      end
-
-      require('telescope.pickers')
-        .new({}, {
-          prompt_title = 'Harpoon',
-          finder = require('telescope.finders').new_table {
-            results = file_paths,
-          },
-          previewer = conf.file_previewer {},
-          sorter = conf.generic_sorter {},
-        })
-        :find()
-    end
-
-    -- NOTE: <leader>sh is telescope's [S]earch [H]elp (see plugins/telescope.lua);
-    -- Harpoon marks live at <leader>sm instead to avoid silently shadowing it.
+    -- Picker UI integration - shows Harpoon marks in whichever picker
+    -- backend (Telescope or snacks) is currently active. See
+    -- lua/config/picker.lua for the wrapper implementation.
+    --
+    -- NOTE: <leader>sh is [S]earch [H]elp (see plugins/telescope.lua and
+    -- plugins/snacks.lua); Harpoon marks live at <leader>sm instead to avoid
+    -- silently shadowing it.
     vim.keymap.set('n', '<leader>sm', function()
-      toggle_telescope(harpoon:list())
+      require('config.picker').harpoon_marks(harpoon:list())
     end, { desc = '[S]earch Harpoon [M]arks' })
   end,
 }

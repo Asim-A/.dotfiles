@@ -1,5 +1,12 @@
 return { -- Fuzzy Finder (files, lsp, etc)
   'nvim-telescope/telescope.nvim',
+  -- Only load this plugin (and the keymaps its `config` sets up below) when
+  -- 'telescope' is the active picker backend - see lua/config/picker.lua.
+  -- folke/snacks.nvim (plugins/snacks.lua) is the alternative backend and
+  -- mirrors every keymap defined here.
+  enabled = function()
+    return require('config.picker').is_telescope()
+  end,
   event = 'VimEnter',
   branch = '0.1.x',
   dependencies = {
