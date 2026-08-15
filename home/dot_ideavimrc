@@ -1,0 +1,27 @@
+set rnu
+set mouse=a
+set cliboard=unnamedplus
+set idearefactormode=keep
+set which-key
+set surround
+set highlightedyank
+set ideajoin
+set mini-ai
+
+set scrolloff=30
+
+nnoremap <SPACE> <Nop>
+let mapleader=" "
+nnoremap <leader>e :Ex<CR>
+nnoremap <leader>h :nohlsearch<CR>
+
+imap jk <Esc>
+set timeoutlen=2000
+
+nnoremap gn :action GotoNextError<CR>
+nnoremap gp :action GotoPreviousError<CR>
+
+sethandler <Space> n-v:vim i:ide
+
+nmap gi :action GotoImplementation<CR>
+nmap gd :action GotoDeclaration<CR>
