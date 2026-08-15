@@ -1,0 +1,126 @@
+#Requires -Version 5.1
+<#
+.SYNOPSIS
+    Finds a working `file.exe` on this Windows machine and points yazi's
+    YAZI_FILE_ONE user environment variable at it.
+
+.DESCRIPTION
+    yazi relies on the Unix `file` utility for mime-type detection, which
+    drives its preview pane. On Windows there's no native equivalent, so
+    yazi looks for one via the YAZI_FILE_ONE environment variable.
+
+    A `file.exe` that merely exists on disk isn't enough - some builds fail
+    at runtime (e.g. missing DLL dependencies), which yazi swallows silently
+    and just shows a blank preview. This script only accepts a candidate
+    that actually runs successfully.
+
+    Candidates are checked in order:
+      1. The current YAZI_FILE_ONE value, if already set and working.
+      2. `file.exe` bundled with Git for Windows (common install locations).
+      3. Any `file.exe`/`file` already resolvable on PATH.
+
+    Re-running this script is safe - it re-validates and updates the user
+    environment variable if a better/working candidate is found.
+
+.NOTES
+    Runs automatically via chezmoi on Windows (run_onchange_after_ - chezmoi
+    hashes this script's content and re-runs it whenever that hash changes,
+    same as run_once_after_install-packages-windows.ps1.tmpl). Windows-only;
+    excluded elsewhere via .chezmoiignore.tmpl.
+
+    Restart your terminal afterwards so it picks up the new environment
+    variable.
+#>
+
+[CmdletBinding()]
+param()
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
+
+function Test-FileExe {
+    <#
+        Returns $true if the given path is a `file` binary that can
+        actually execute (not just present on disk).
+    #>
+    param([string]$Path)
+
+    if ([string]::IsNullOrWhiteSpace($Path) -or -not (Test-Path -LiteralPath $Path -PathType Leaf)) {
+        return $false
+    }
+
+    try {
+        & $Path --version *> $null
+        return $LASTEXITCODE -eq 0
+    } catch {
+        return $false
+    }
+}
+
+Write-Host "Looking for a working file.exe for yazi..." -ForegroundColor Cyan
+
+$candidates = [System.Collections.Generic.List[string]]::new()
+
+# 1. Current YAZI_FILE_ONE, if any.
+$currentValue = [Environment]::GetEnvironmentVariable('YAZI_FILE_ONE', 'User')
+if ($currentValue) {
+    $candidates.Add($currentValue)
+}
+
+# 2. Git for Windows' bundled file.exe, in the usual install locations.
+$gitRoots = @(
+    "$env:ProgramFiles\Git",
+    "${env:ProgramFiles(x86)}\Git",
+    "$env:LOCALAPPDATA\Programs\Git",
+    "$env:ProgramW6432\Git"
+) | Where-Object { $_ }
+
+foreach ($root in $gitRoots) {
+    $candidates.Add((Join-Path $root 'usr\bin\file.exe'))
+}
+
+# Also derive the Git root from `git.exe` on PATH, in case it's installed
+# somewhere non-standard.
+$gitCmd = Get-Command git.exe -ErrorAction SilentlyContinue
+if ($gitCmd) {
+    # git.exe lives in <root>\cmd or <root>\bin; usr\bin\file.exe hangs off <root>.
+    $gitRootFromPath = Split-Path -Parent (Split-Path -Parent $gitCmd.Source)
+    $candidates.Add((Join-Path $gitRootFromPath 'usr\bin\file.exe'))
+}
+
+# 3. Anything already resolvable on PATH.
+foreach ($name in @('file.exe', 'file')) {
+    $cmd = Get-Command $name -ErrorAction SilentlyContinue
+    if ($cmd) {
+        $candidates.Add($cmd.Source)
+    }
+}
+
+$working = $null
+foreach ($candidate in $candidates | Select-Object -Unique) {
+    Write-Host "  Checking $candidate" -ForegroundColor DarkGray
+    if (Test-FileExe -Path $candidate) {
+        Write-Host "  -> works" -ForegroundColor Green
+        $working = $candidate
+        break
+    } else {
+        Write-Host "  -> not usable" -ForegroundColor DarkYellow
+    }
+}
+
+if (-not $working) {
+    Write-Warning "No working file.exe found."
+    Write-Warning "Install Git for Windows (it bundles file.exe): winget install --id Git.Git -e"
+    Write-Warning "Then re-run this script."
+    exit 1
+}
+
+if ($currentValue -eq $working) {
+    Write-Host "YAZI_FILE_ONE is already correctly set to: $working" -ForegroundColor Green
+} else {
+    [Environment]::SetEnvironmentVariable('YAZI_FILE_ONE', $working, 'User')
+    Write-Host "Set YAZI_FILE_ONE (user) to: $working" -ForegroundColor Green
+}
+
+$env:YAZI_FILE_ONE = $working
+Write-Host "Restart your terminal/WezTerm so the new environment variable is picked up." -ForegroundColor Cyan
