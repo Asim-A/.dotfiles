@@ -29,6 +29,7 @@ return { -- Highlight, edit, and navigate code
       'typescript',
       'tsx',
       'javascript',
+      'regex'
     },
     auto_install = true,
     highlight = {

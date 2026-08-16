@@ -23,6 +23,7 @@ packages:
       - lazygit
       - trash-cli
       - starship
+      - mise
     casks:
       - wezterm
   # Installed via winget on Windows by run_once_after_install-packages-windows.ps1.tmpl
