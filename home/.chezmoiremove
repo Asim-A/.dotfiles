@@ -1,0 +1,10 @@
+# Files that used to be managed by this source state but have since been
+# removed here. chezmoi only applies what's currently in the source state -
+# it won't delete a previously-applied target just because the source file
+# disappeared, so removals that must reach machines that already ran
+# `chezmoi apply` have to be listed explicitly here.
+# https://www.chezmoi.io/reference/special-files-and-directories/chezmoiremove/
+
+# noice.nvim replaced by snacks.nvim's notifier module (see
+# home/dot_config/nvim/lua/plugins/snacks.lua).
+.config/nvim/lua/plugins/noice.lua

@@ -1,0 +1,56 @@
+Invoke-Expression (&starship init powershell)
+
+function open_profile {
+    nvim $profile/..
+}
+
+function clear_build_folders([string]$path = ".\") {
+    Write-Host "Clearing buildFolders under $path" -ForegroundColor Green
+    & Get-ChildItem $path -include bin, obj, artifacts, packages, out, node_modules -Recurse | foreach ($_) {
+        Write-Host $_.FullName -ForegroundColor DarkRed
+        remove-item $_.fullname -Force -Recurse
+    }
+}
+
+function cdgit {
+    Set-Location -Path c:/git
+}
+
+function cddot {
+    Set-Location -Path (chezmoi source-path)
+}
+
+function ToNeovimConfig {
+    Set-Location -Path "$HOME\.config\nvim"
+}
+
+Set-Alias cdnvc ToNeovimConfig
+Set-Alias v nvim
+Set-Alias vim nvim
+Set-Alias grep rg
+Set-Alias which Get-Command
+
+Import-Module PSFzf
+
+# Override PSReadLine's history search
+Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+n' `
+                -PSReadlineChordReverseHistory 'Ctrl+p'
+
+# Override default tab completion
+Set-PSReadLineKeyHandler -Key Tab -ScriptBlock { Invoke-FzfTabCompletion }
+
+# Volta fix
+if (Get-Command volta -ErrorAction SilentlyContinue) {
+ $voltaNodeDir = Split-Path (volta which node)
+ if (($env:Path -split ';') -notcontains $voltaNodeDir) {
+   $env:Path = "$voltaNodeDir;$env:Path"
+ }
+}
+
+# Generic local-override hook: content-free in the public repo by design.
+# Anything organization/employer-specific lives in a separate private
+# repo/location and is sourced from there, never referenced by name/path from
+# this public repo.
+if (Test-Path "$HOME\.work-profile.ps1") {
+    . "$HOME\.work-profile.ps1"
+}

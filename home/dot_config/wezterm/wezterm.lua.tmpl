@@ -1,0 +1,137 @@
+-- Pull in the wezterm API
+local wezterm = require("wezterm")
+
+-- Maximize on startup (both platforms).
+wezterm.on("gui-startup", function(cmd)
+	local tab, pane, window = wezterm.mux.spawn_window(cmd or {})
+	window:gui_window():maximize()
+end)
+
+-- This will hold the configuration.
+local config = wezterm.config_builder()
+
+config.color_scheme = "GruvboxDarkHard"
+config.automatically_reload_config = true
+config.window_decorations = "RESIZE"
+config.hide_tab_bar_if_only_one_tab = true
+config.enable_scroll_bar = true
+config.scrollback_lines = 5000
+config.font = wezterm.font("JetBrains Mono")
+
+{{- if eq .chezmoi.os "windows" }}
+-- Launch PowerShell 7 by default.
+config.default_prog = { "C:/Program Files/PowerShell/7/pwsh.exe" }
+{{- end }}
+
+-- nvim binds these two unlikely-to-type unicode characters directly (see
+-- dot_config/nvim/init.lua's visual/live grep keymaps and the conform.nvim
+-- "format buffer" keymap) as a portable way to trigger them from a single
+-- WezTerm shortcut that a terminal app can't otherwise represent.
+{{- $specialMods := "CTRL|SHIFT" }}
+{{- if eq .chezmoi.os "darwin" }}
+{{- $specialMods = "CMD|SHIFT" }}
+{{- end }}
+config.keys = {
+	{ key = "f", mods = "{{ $specialMods }}", action = wezterm.action.SendString("♠") },
+	{ key = "Enter", mods = "{{ $specialMods }}", action = wezterm.action.SendString("♣") },
+}
+
+{{- if eq .chezmoi.os "darwin" }}
+-- macOS Option/Alt is reserved for composing special characters, so CMD is
+-- used here instead as a reliable way to synthesize Meta+key escape
+-- sequences for nvim's Alt-based keymaps (harpoon2.lua's <M-h/j/k/l>,
+-- init.lua's <M-n>/<M-p> quickfix nav). Plain Alt already sends these
+-- natively on Windows, so no equivalent is needed there.
+local mac_meta_keys = { "h", "j", "k", "l", "n", "p" }
+for _, key in ipairs(mac_meta_keys) do
+	table.insert(config.keys, { key = key, mods = "CMD", action = wezterm.action.SendString("\x1b" .. key) })
+end
+
+-- CMD+F is macOS's system "Find" shortcut; remap it to Ctrl+F instead so it
+-- doesn't get swallowed before reaching the terminal application.
+table.insert(config.keys, { key = "f", mods = "CMD", action = wezterm.action.SendKey { key = "f", mods = "CTRL" } })
+{{- end }}
+
+{{- if eq .chezmoi.os "windows" }}
+-- WezTerm owns pane splitting/navigation directly on Windows since there is
+-- no tmux layer there (see dot_config/tmux, which is mac/linux only). On
+-- Mac/Linux tmux owns multiplexing instead, with its own Ctrl-a prefix, so
+-- none of this leader-key config is applied there to avoid the two fighting
+-- over the same keys.
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+
+local function is_vim(pane)
+	local process_info = pane:get_foreground_process_info()
+	local process_name = process_info and process_info.name
+	return process_name == "nvim" or process_name == "vim"
+end
+
+local direction_keys = {
+	Left = "h",
+	Down = "j",
+	Up = "k",
+	Right = "l",
+	-- reverse lookup
+	h = "Left",
+	j = "Down",
+	k = "Up",
+	l = "Right",
+}
+
+local function split_nav(resize_or_move, key)
+	return {
+		key = key,
+		mods = resize_or_move == "resize" and "CTRL|SHIFT" or "CTRL",
+		action = wezterm.action_callback(function(win, pane)
+			if is_vim(pane) then
+				-- pass the keys through to vim/nvim
+				win:perform_action({
+					SendKey = { key = key, mods = resize_or_move == "resize" and "CTRL|SHIFT" or "CTRL" },
+				}, pane)
+			else
+				if resize_or_move == "resize" then
+					win:perform_action({ AdjustPaneSize = { direction_keys[key], 3 } }, pane)
+				else
+					win:perform_action({ ActivatePaneDirection = direction_keys[key] }, pane)
+				end
+			end
+		end),
+	}
+end
+
+for _, k in ipairs {
+	{ mods = "LEADER", key = "-", action = wezterm.action.SplitVertical { domain = "CurrentPaneDomain" } },
+	{ mods = "LEADER", key = "+", action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" } },
+	{ mods = "LEADER", key = "m", action = wezterm.action.TogglePaneZoomState },
+	{ mods = "LEADER", key = "Space", action = wezterm.action.RotatePanes "Clockwise" },
+	-- show the pane selection mode, but have it swap the active and selected panes
+	{ mods = "LEADER", key = "0", action = wezterm.action.PaneSelect { mode = "SwapWithActive" } },
+	{ key = "c", mods = "LEADER", action = wezterm.action.SpawnTab "CurrentPaneDomain" },
+	{ key = "p", mods = "LEADER", action = wezterm.action.ActivateTabRelative(-1) },
+	{ key = "n", mods = "LEADER", action = wezterm.action.ActivateTabRelative(1) },
+	{ key = "v", mods = "LEADER", action = wezterm.action.ActivateCopyMode },
+	split_nav("move", "h"),
+	split_nav("move", "j"),
+	split_nav("move", "k"),
+	split_nav("move", "l"), -- move between split panes
+	split_nav("resize", "h"),
+	split_nav("resize", "j"),
+	split_nav("resize", "k"),
+	split_nav("resize", "l"), -- resize panes
+	{ key = "1", mods = "LEADER", action = wezterm.action.ActivateTab(0) },
+	{ key = "2", mods = "LEADER", action = wezterm.action.ActivateTab(1) },
+	{ key = "3", mods = "LEADER", action = wezterm.action.ActivateTab(2) },
+	{ key = "4", mods = "LEADER", action = wezterm.action.ActivateTab(3) },
+	{ key = "5", mods = "LEADER", action = wezterm.action.ActivateTab(4) },
+	{ key = "6", mods = "LEADER", action = wezterm.action.ActivateTab(5) },
+	{ key = "7", mods = "LEADER", action = wezterm.action.ActivateTab(6) },
+	{ key = "8", mods = "LEADER", action = wezterm.action.ActivateTab(7) },
+	{ key = "9", mods = "LEADER", action = wezterm.action.ActivateTab(8) },
+	{ key = "x", mods = "LEADER", action = wezterm.action.CloseCurrentPane { confirm = true } },
+} do
+	table.insert(config.keys, k)
+end
+{{- end }}
+
+-- and finally, return the configuration to wezterm
+return config
