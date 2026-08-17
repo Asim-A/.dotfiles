@@ -1,39 +1,47 @@
-if [[ -f "/opt/homebrew/bin/brew" ]] then
-  # if you're using macOS, you'll want this enabled
+VOLTA_HOME="$HOME/.volta"
+export VOLTA_HOME
+export PATH="$HOME/.local/bin:$VOLTA_HOME/bin:$PATH"
+
+{{ if eq .chezmoi.os "darwin" }}
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
+{{ end }}
 
 # set the directory we want to store zinit and plugins
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-VOLTA_HOME="$HOME/.volta"
 
 # download Zinit, if it's not there yet
-if [ ! -d "$ZINIT_HOME" ]; then
-   mkdir -p "$(dirname $ZINIT_HOME)"
-   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+if [[ ! -r "$ZINIT_HOME/zinit.zsh" ]]; then
+  mkdir -p "$(dirname "$ZINIT_HOME")"
+  if command -v git >/dev/null 2>&1; then
+    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" ||
+      print -u2 "Zinit installation failed; continuing without Zinit plugins."
+  else
+    print -u2 "git is unavailable; continuing without Zinit plugins."
+  fi
 fi
 
-# source/Load zinit
-source "${ZINIT_HOME}/zinit.zsh"
+if [[ -r "$ZINIT_HOME/zinit.zsh" ]]; then
+  source "$ZINIT_HOME/zinit.zsh"
 
-# zinit is kept for zsh plugins only - the prompt itself is Starship (see
-# below), shared with the Windows PowerShell profile.
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
+  # zinit is kept for zsh plugins only - the prompt itself is Starship.
+  zinit light zsh-users/zsh-syntax-highlighting
+  zinit light zsh-users/zsh-completions
+  zinit light zsh-users/zsh-autosuggestions
 
-# add in snippets
-zinit snippet OMZL::git.zsh
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-zinit snippet OMZP::kubectl
-zinit snippet OMZP::kubectx
-zinit snippet OMZP::command-not-found
+  zinit snippet OMZL::git.zsh
+  zinit snippet OMZP::git
+  zinit snippet OMZP::sudo
+  zinit snippet OMZP::kubectl
+  zinit snippet OMZP::kubectx
+  zinit snippet OMZP::command-not-found
+fi
 
 # load completions
-fpath=(~/.zsh/completion $fpath)
+fpath=("$HOME/.zsh/completion" $fpath)
 autoload -Uz compinit
-for dump in ~/.zcompdump(N.mh+24); do
+for dump in "$HOME"/.zcompdump(N.mh+24); do
   compinit
 done
 compinit -C
@@ -42,13 +50,19 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^x^e' edit-command-line
 
-zinit cdreplay -q
+if (( $+functions[zinit] )); then
+  zinit cdreplay -q
+fi
 
 # Starship prompt (shared config: ~/.config/starship.toml)
-eval "$(starship init zsh)"
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+fi
 
 # mise prompt
-eval "$(mise activate zsh)"
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate zsh)"
+fi
 
 # keybindings
 bindkey -e
@@ -96,25 +110,44 @@ alias sshedit='nvim ~/.ssh'
 alias cdgit='mkdir -p ~/git && cd ~/git'
 alias cdssh='mkdir -p ~/.ssh && cd ~/.ssh'
 alias cddot='cd "$(chezmoi source-path)"'
-alias cddata='cd ~/Library/Application\ Support'
 alias gg='gemini -p'
 
-alias -g JQ '| jq';
-alias -g C '| pbcopy';
+alias -g JQ='| jq'
+
+{{ if eq .chezmoi.os "darwin" }}
+alias cddata='cd "$HOME/Library/Application Support"'
+alias -g C='| pbcopy'
+
+export DOTNET_ROOT="/usr/local/share/dotnet"
+export PATH="$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools"
+{{ end }}
 
 # shell integrations
-eval "$(fzf --zsh)"
-eval "$(uv generate-shell-completion zsh)"
+if command -v fzf >/dev/null 2>&1; then
+  if fzf_zsh="$(fzf --zsh 2>/dev/null)"; then
+    eval "$fzf_zsh"
+  else
+    for integration in \
+      /usr/share/doc/fzf/examples/completion.zsh \
+      /usr/share/doc/fzf/examples/key-bindings.zsh; do
+      [[ ! -r "$integration" ]] || source "$integration"
+    done
+  fi
+  unset fzf_zsh
+fi
 
+if command -v uv >/dev/null 2>&1; then
+  eval "$(uv generate-shell-completion zsh)"
+fi
 
-export DOTNET_ROOT=/usr/local/share/dotnet
-export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools:$VOLTA_HOME/bin
-export MASON=$HOME/.local/share/nvim/mason
-export EDITOR=nvim
+export MASON="$HOME/.local/share/nvim/mason"
+export EDITOR="nvim"
 
-zinit light Aloxaf/fzf-tab
+if (( $+functions[zinit] )); then
+  zinit light Aloxaf/fzf-tab
+fi
 
 # Generic local-override hook: content-free in the public repo by design.
 # Anything organization/employer-specific lives in a separate private
 # repo/location and is sourced from there, never referenced by name here.
-[[ ! -f ~/.work-profile.zsh ]] || source ~/.work-profile.zsh
+[[ ! -f "$HOME/.work-profile.zsh" ]] || source "$HOME/.work-profile.zsh"

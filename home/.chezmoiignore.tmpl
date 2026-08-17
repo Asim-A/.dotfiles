@@ -2,18 +2,37 @@
   Target-relative paths (as chezmoi source-name parsing would produce them),
   not literal source file names.
 */}}
-# tmux is superseded by WezTerm's native leader-key/pane-nav on Windows, and
-# zsh isn't the shell there either - skip both on Windows.
-{{- if eq .chezmoi.os "windows" }}
+{{ if eq .chezmoi.os "windows" -}}
+# tmux is superseded by WezTerm's pane navigation, and zsh is not used.
 .config/tmux
 .zshrc
 install-packages-darwin.sh
-{{- else }}
-# PowerShell profile is Windows-only.
+install-packages-debian.sh
+{{ else if eq .chezmoi.os "darwin" -}}
 Documents/PowerShell/Microsoft.PowerShell_profile.ps1
 install-packages-windows.ps1
+install-packages-debian.sh
 windows-yazi-fix.ps1
-{{- end }}
+{{ else if eq .chezmoi.os "linux" -}}
+# Debian server core excludes workstation and non-Linux configuration.
+.config/wezterm
+.config/yazi
+.ideavimrc
+Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+install-packages-darwin.sh
+install-packages-windows.ps1
+windows-yazi-fix.ps1
+{{ else -}}
+# Unsupported platforms must not run an OS-specific package installer.
+.config/wezterm
+.config/yazi
+.ideavimrc
+Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+install-packages-darwin.sh
+install-packages-windows.ps1
+install-packages-debian.sh
+windows-yazi-fix.ps1
+{{ end -}}
 # lazy.nvim's plugin lockfile is machine-specific churn, not something the
 # dotfiles manager should own or overwrite.
 .config/nvim/lazy-lock.json

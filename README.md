@@ -1,8 +1,8 @@
 # .dotfiles
 
-Cross-platform (macOS + Windows) dotfiles managed with [chezmoi](https://www.chezmoi.io/).
-One source tree, applied natively on both platforms - no symlinks, no GNU Stow,
-no WSL required.
+Cross-platform macOS, Windows, and Debian server-core dotfiles managed with
+[chezmoi](https://www.chezmoi.io/). One source tree is applied natively on
+each platform - no GNU Stow or WSL required.
 
 ## Layout
 
@@ -13,13 +13,13 @@ is never applied to your `$HOME`.
 
 Highlights:
 
-- `home/dot_config/nvim` - single LazyVim-based Neovim config, shared as-is
-  on macOS and Windows (see `lua/lazy/plugins/pane-nav.lua` for the one
-  OS-conditional bit: tmux-navigator vs. WezTerm's own pane navigation).
+- `home/dot_config/nvim` - single LazyVim-based Neovim config shared across
+  all supported platforms. Yazi integration is disabled when its executable
+  is unavailable.
 - `home/dot_config/wezterm` - shared WezTerm config; OS-specific bits
   (default shell, leader-key pane splitting on Windows since there's no tmux
   there) are handled with chezmoi templating.
-- `home/dot_config/tmux` - macOS/Linux only (WezTerm's own leader-key pane
+- `home/dot_config/tmux` - macOS/Debian only (WezTerm's own leader-key pane
   nav covers this on Windows).
 - `home/dot_config/starship.toml` - single shared prompt, used by both zsh
   and PowerShell. Powerlevel10k has been retired.
@@ -61,11 +61,33 @@ Windows (PowerShell):
 chezmoi init --apply --source=C:\git\.dotfiles
 ```
 
+Debian 11 Bullseye VPS prerequisites and bootstrap:
+
+```sh
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl git
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+mkdir -p "$HOME/git"
+git clone https://github.com/Asim-A/.dotfiles.git "$HOME/git/.dotfiles"
+"$HOME/.local/bin/chezmoi" init --apply --source="$HOME/git/.dotfiles"
+```
+
 `chezmoi init` prompts once per machine (see `home/.chezmoi.toml.tmpl`) for
 your git email, then applies the managed files. A
-`run_once_after_install-packages-<os>` script (Homebrew on macOS, winget on
-Windows) installs the required tools - see `home/.chezmoidata.yaml` for the
-package list.
+`run_once_after_install-packages-<os>` script installs the required tools
+through Homebrew on macOS, winget on Windows, or apt plus verified user-local
+releases on Debian. See `home/.chezmoidata.yaml` for the package manifests.
+
+The Debian server-core profile installs Git, zsh, tmux, ripgrep, fzf,
+trash-cli, build utilities, Neovim, Starship, Volta, and the current Node.js
+LTS selected by Volta. Neovim and Starship live under `~/.local`, while Volta
+owns Node under `~/.volta`. It does not install or apply WezTerm, Yazi,
+IdeaVim, PowerShell, mise, .NET, Go, Python-specific toolchains, or desktop
+clipboard/open utilities.
+
+The Debian installer changes the login shell with `chsh`; zsh becomes active
+on the next login. Bullseye reaches the end of LTS on 2026-08-31 and should be
+upgraded independently of this bootstrap.
 
 Windows additionally gets `XDG_CONFIG_HOME` set to `%USERPROFILE%\.config`
 persistently, so Neovim/WezTerm/Yazi resolve the exact same `~/.config/...`

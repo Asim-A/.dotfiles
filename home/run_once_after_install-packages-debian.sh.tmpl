@@ -1,0 +1,139 @@
+#!/bin/bash
+# Runs once, then re-runs whenever this script or its package data changes.
+# Installs the Debian server-core profile without replacing distribution files.
+set -euo pipefail
+
+if [[ ! -r /etc/os-release ]]; then
+  echo "Cannot identify this host: /etc/os-release is missing." >&2
+  exit 1
+fi
+
+# shellcheck disable=SC1091
+source /etc/os-release
+if [[ "${ID:-}" != "debian" ]]; then
+  echo "This installer supports Debian only; detected ${PRETTY_NAME:-unknown}." >&2
+  exit 1
+fi
+
+if [[ "$(dpkg --print-architecture)" != "amd64" ]]; then
+  echo "This installer currently supports Debian amd64 only." >&2
+  exit 1
+fi
+
+if [[ "${VERSION_CODENAME:-}" != "bullseye" ]]; then
+  echo "Note: Bullseye is the tested target; continuing on ${PRETTY_NAME:-Debian}." >&2
+fi
+
+apt_packages=(
+{{ range .packages.debian.apt -}}
+  {{ . | quote }}
+{{ end -}}
+)
+
+sudo apt-get update
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "${apt_packages[@]}"
+
+local_bin="$HOME/.local/bin"
+local_opt="$HOME/.local/opt"
+volta_home="$HOME/.volta"
+mkdir -p "$local_bin" "$local_opt" "$volta_home/bin"
+
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf -- "$tmp_dir"' EXIT
+
+download_verified() {
+  local url="$1"
+  local checksum="$2"
+  local output="$3"
+
+  curl --fail --location --retry 3 --proto '=https' --tlsv1.2 \
+    --output "$output" "$url"
+  printf '%s  %s\n' "$checksum" "$output" | sha256sum --check -
+}
+
+nvim_version={{ .packages.debian.releases.neovim.version | quote }}
+nvim_dir="$local_opt/nvim-$nvim_version"
+if [[ ! -x "$nvim_dir/bin/nvim" ]]; then
+  nvim_archive="$tmp_dir/{{ .packages.debian.releases.neovim.archive }}"
+  nvim_extract="$tmp_dir/nvim"
+  download_verified \
+    {{ .packages.debian.releases.neovim.url | quote }} \
+    {{ .packages.debian.releases.neovim.sha256 | quote }} \
+    "$nvim_archive"
+  mkdir -p "$nvim_extract"
+  tar -xzf "$nvim_archive" -C "$nvim_extract"
+  extracted_nvim="$nvim_extract/{{ .packages.debian.releases.neovim.archiveRoot }}"
+  if [[ ! -x "$extracted_nvim/bin/nvim" ]]; then
+    echo "The Neovim archive did not contain the expected executable." >&2
+    exit 1
+  fi
+  rm -rf -- "$nvim_dir"
+  mv -- "$extracted_nvim" "$nvim_dir"
+fi
+ln -sfn "$nvim_dir/bin/nvim" "$local_bin/nvim"
+
+starship_version={{ .packages.debian.releases.starship.version | quote }}
+starship_dir="$local_opt/starship-$starship_version"
+if [[ ! -x "$starship_dir/starship" ]]; then
+  starship_archive="$tmp_dir/{{ .packages.debian.releases.starship.archive }}"
+  starship_extract="$tmp_dir/starship"
+  download_verified \
+    {{ .packages.debian.releases.starship.url | quote }} \
+    {{ .packages.debian.releases.starship.sha256 | quote }} \
+    "$starship_archive"
+  mkdir -p "$starship_extract"
+  tar -xzf "$starship_archive" -C "$starship_extract"
+  if [[ ! -x "$starship_extract/starship" ]]; then
+    echo "The Starship archive did not contain the expected executable." >&2
+    exit 1
+  fi
+  rm -rf -- "$starship_dir"
+  mkdir -p "$starship_dir"
+  install -m 0755 "$starship_extract/starship" "$starship_dir/starship"
+fi
+ln -sfn "$starship_dir/starship" "$local_bin/starship"
+
+volta_version={{ .packages.debian.releases.volta.version | quote }}
+installed_volta_version=""
+if [[ -x "$volta_home/bin/volta" ]]; then
+  installed_volta_version="$(
+    "$volta_home/bin/volta" --version |
+      sed -E 's/^.*([0-9]+\.[0-9]+\.[0-9]+).*$/\1/'
+  )"
+fi
+if [[ "$installed_volta_version" != "$volta_version" ]]; then
+  volta_archive="$tmp_dir/{{ .packages.debian.releases.volta.archive }}"
+  volta_extract="$tmp_dir/volta"
+  download_verified \
+    {{ .packages.debian.releases.volta.url | quote }} \
+    {{ .packages.debian.releases.volta.sha256 | quote }} \
+    "$volta_archive"
+  mkdir -p "$volta_extract"
+  tar -xzf "$volta_archive" -C "$volta_extract"
+  for executable in volta volta-shim volta-migrate; do
+    if [[ ! -x "$volta_extract/$executable" ]]; then
+      echo "The Volta archive did not contain $executable." >&2
+      exit 1
+    fi
+    install -m 0755 "$volta_extract/$executable" "$volta_home/bin/$executable"
+  done
+fi
+
+export VOLTA_HOME="$volta_home"
+export PATH="$local_bin:$VOLTA_HOME/bin:$PATH"
+"$VOLTA_HOME/bin/volta" install {{ .packages.debian.node.default | quote }}
+
+zsh_path="$(command -v zsh)"
+if ! grep -Fxq "$zsh_path" /etc/shells; then
+  printf '%s\n' "$zsh_path" | sudo tee -a /etc/shells >/dev/null
+fi
+
+user_name="$(id -un)"
+login_shell="$(getent passwd "$user_name" | cut -d: -f7)"
+if [[ -z "$login_shell" ]]; then
+  echo "Could not determine the login shell for $user_name." >&2
+  exit 1
+fi
+if [[ "$login_shell" != "$zsh_path" ]]; then
+  chsh -s "$zsh_path"
+fi

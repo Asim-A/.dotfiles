@@ -38,3 +38,40 @@ packages:
       - Starship.Starship
       - wez.wezterm
       - Volta.Volta
+  # Debian server core installed by run_once_after_install-packages-debian.sh.tmpl
+  debian:
+    apt:
+      - ca-certificates
+      - curl
+      - git
+      - zsh
+      - tmux
+      - ripgrep
+      - fzf
+      - unzip
+      - xz-utils
+      - build-essential
+      - trash-cli
+      - libc6
+      - libgcc-s1
+      - libstdc++6
+    releases:
+      # Newer official binaries require glibc 2.34; Bullseye provides 2.31.
+      neovim:
+        version: 0.10.4
+        archive: nvim-linux-x86_64.tar.gz
+        archiveRoot: nvim-linux-x86_64
+        url: https://github.com/neovim/neovim/releases/download/v0.10.4/nvim-linux-x86_64.tar.gz
+        sha256: 95aaa8e89473f5421114f2787c13ae0ec6e11ebbd1a13a1bd6fcf63420f8073f
+      starship:
+        version: 1.26.0
+        archive: starship-x86_64-unknown-linux-musl.tar.gz
+        url: https://github.com/starship/starship/releases/download/v1.26.0/starship-x86_64-unknown-linux-musl.tar.gz
+        sha256: b7c232b0e8249d8e55a40beb79c5c43a7d370f3f9408bd215deb0170daeaadf3
+      volta:
+        version: 2.0.2
+        archive: volta-2.0.2-linux.tar.gz
+        url: https://github.com/volta-cli/volta/releases/download/v2.0.2/volta-2.0.2-linux.tar.gz
+        sha256: 6cec054c911fb925b629a09455775af6e95dc0f5694a4c28b63979ab9ef18037
+    node:
+      default: node@lts

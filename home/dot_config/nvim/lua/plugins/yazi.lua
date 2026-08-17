@@ -1,6 +1,7 @@
 return { ---@type LazySpec
   'mikavilpas/yazi.nvim',
   version = '*', -- use the latest stable version
+  enabled = vim.fn.executable('yazi') == 1,
   event = 'VeryLazy',
   dependencies = {
     { 'nvim-lua/plenary.nvim', lazy = true },
